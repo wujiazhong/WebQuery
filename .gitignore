@@ -1,0 +1,5 @@
+.classpath
+*.class
+.project
+.tern-project
+.seetings/*
