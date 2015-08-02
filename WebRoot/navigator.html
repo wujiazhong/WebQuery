@@ -1,0 +1,76 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>    
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta http-equiv="description" content="Navigator">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" href="css/bootstrap.min.css">
+	<link rel="stylesheet" href="css/jquery.multiselect2side.css" >
+	<link rel="stylesheet" href="css/style.css">
+	
+  </head>
+  <body>			
+	<header>
+		<div class="navbar navbar-default" role="navigation" style="padding: 0 10px;margin: 0 0;">
+		   <div class="navbar-header">
+			  <p class="navbar-text"><a href="homepage.html">首页</a></p>
+			  <p class="navbar-text"><a href="index.html">注销登录</a></p>
+		   </div>
+		   <div class="navbar-header navbar-right">
+			  <p class="navbar-text" id="username">用户名：</p>
+			  <p class="navbar-text" id="userteam">所属采油队：</p>
+		   </div>
+		</div>
+	</header>
+  	<center>
+		<nav class="navbar navbar-inverse" role="navigation">
+		   <div>
+		      <ul class="nav navbar-nav">
+		         <li class="tab_link" id="general"><a href="#">总体概览</a></li>
+		         <li class="tab_link" id="prediction"><a href="#">分析预测</a></li>
+		         <li class="tab_link" id="diagnose"><a href="#">功图诊断</a></li>
+		         <li class="tab_link" id="dataupdate"><a href="#">数据更新</a></li>
+		      </ul>
+		   </div>
+		</nav>
+  	  <div id="nav_main_field">
+  	  	<!-- cognos report -->
+  	  </div>
+  	</center>
+  	<script type="text/javascript" src="js/jquery.js"></script>
+	<script type="text/javascript" src="js/bootstrap.min.js"></script>
+	<script type="text/javascript" src="js/jquery.cookie.js"></script>
+   	<script type="text/javascript" src="js/method.js"></script>
+    <script type="text/javascript">
+    	$(document).ready(function(){			
+			document.getElementById("username").innerHTML = "用户名: "+ $.cookie("user");
+			document.getElementById("userteam").innerHTML = "所属采油队: "+ $.cookie("userteam");
+			var nav_link = $.cookie("nav_link");
+			
+			var view_name = getParameterByName("view");
+			$.each($("li"), function(key, val){
+				if( view_name == $(this).attr("id"))
+				{
+					$(this).addClass("active");
+				}else{
+					$(this).addClass("inactive");
+				}
+			});
+			
+			var backhome_action = "window.open('homepage.html?user="+$.cookie("user")+"')";
+			$("#ret_btn").attr("onclick", backhome_action);
+
+			//bubble up the hyperlink to all the div
+			$(".inactive").click(function(e){
+				var view_name = $(this).attr("id");
+				window.open(nav_link + "&view="+view_name, "_self");
+				e.stopPropagation();
+				
+			});
+			
+			$("#nav_main_field").load(view_name+".html");
+
+		});
+    </script>
+  </body>
+</html>
