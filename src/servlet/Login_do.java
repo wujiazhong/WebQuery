@@ -7,6 +7,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import dao.DAO;
 import net.sf.json.JSONException;
@@ -73,6 +74,7 @@ public class Login_do extends HttpServlet {
 				try {
 					jsonObj.put("msg", check_status); 
 					jsonObj.put("userteam", user.getUserTeam());
+					jsonObj.put("usertype", user.getUserType());
 					
 					PrintWriter out = response.getWriter();
 					out.write(jsonObj.toString());

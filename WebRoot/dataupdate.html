@@ -18,10 +18,122 @@
 				<select class="selectpicker"></select>
 			</div>
 			<div class="col-md-12 container">
-				<div class="container col-md-6 container" id="jl_date_table">
-					
+				<div class="container col-md-6 col-lg-6 container" id="jl_date">
+					<div class="container col-md-12 container">
+						<table id="jl_date_table" class="display" cellspacing="0" width="100%">
+							<thead>
+								<tr>
+									<th>井号</th>
+									<th>结蜡日期</th>
+									<th>修正日期</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td>A123</td>
+									<td>2014-01-23</td>
+									<td>2013-05-23</td>
+								</tr>
+								<tr>
+									<td>c423</td>
+									<td>2011-01-23</td>
+									<td>2013-01-23</td>
+								</tr>
+								<tr>
+									<td>p123</td>
+									<td>2013-01-23</td>
+									<td>2012-01-23</td>
+								</tr>
+								<tr>
+									<td>f121</td>
+									<td>2015-01-23</td>
+									<td>2010-01-23</td>
+								</tr>
+							</tbody>
+						</table>
+						<br>
+						<button id="add_row_btn" class="btn btn-default" data-toggle="modal" data-target="#add_row">Add</button>
+		                <button id="edit_row_btn" class="btn btn-default" data-toggle="modal" data-target="#edit_row">Edit</button>
+		                <button id="del-row_btn" class="btn btn-default" data-toggle="modal" data-target="#del_row">Delete</button>
+		                
+		                <!-- 模态框（Modal） -->
+						<div class="modal fade" id="edit_row" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+						   <div class="modal-dialog">
+						      <div class="modal-content">
+						         <div class="modal-header">
+						            <button type="button" class="close" data-dismiss="modal"aria-hidden="true">×</button>
+						            <h4 class="modal-title" id="myModalLabel">编辑信息</h4>
+						         </div>
+						         <div class="modal-body"></div>
+						         <div class="modal-footer">
+						            <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+						            <button type="button" class="btn btn-primary" id="submit_fix_row">提交</button>
+						         </div>
+						      </div><!-- /.modal-content -->
+						   </div><!-- /.modal-dialog -->
+						</div><!-- /.modal -->
+					</div>
+				</div>
+				
+				
+				<div class="container col-md-6 container" id="xj_date">
+					<div class="container col-md-12 container" id="xj_date_table">
+					</div>
 				</div>
 			</div>
 		 </div>
+		<script type="text/javascript" src="./js/jquery.js"></script>
+		<script type="text/javascript" src="./datatable/js/jquery.dataTables.js"></script>
+  		<script type="text/javascript" src="./js/jquery.cookie.js"></script>
+  		<script type="text/javascript">
+  			$(document).ready(function(){
+  				$("#jl_date_table").dataTable().fnDestroy();
+	  			var jl_date_table = $("#jl_date_table").dataTable({
+	  				"searching": false,
+	  				"bInfo":false,
+	  				"bPaginate": false,
+	  				"aaSorting": [
+					  	[ 0, "asc" ]
+					]
+	  			});
+	  			
+  				$.fn.selectSingleRow = function(data_table){
+	  				$("#"+$(this).attr("id")+" tbody").on("click", "tr", function (){
+				        if ($(this).hasClass("selected")) {
+				            $(this).removeClass("selected");
+				        }
+				        else {
+				            data_table.$("tr.selected").removeClass("selected");
+				            $(this).addClass("selected");
+				        }	  	
+				    });			
+	  			}
+  				
+	  			//set jl_date_table single select
+	  			$("#jl_date_table").selectSingleRow(jl_date_table);
+	  			
+			    $("#jl_date button[id='edit_row_btn']").on("click", function(){
+			    	$(".modal-body").empty();
+			    	var $selected_row = jl_date_table.$("tr.selected");
+			    	
+			    	var $jh_label = $("<label>").text($("#jl_date th").eq(0).text()).css("margin-right","10px").css("width","100px");
+			    	var $jh_val = $("<input>").val($selected_row.children("td").eq(0).text()).attr("disabled","true");
+			    	var $jh_div = $("<div>").append($jh_label).append($jh_val);
+			    	
+			    	var $jl_date_label = $("<label>").text($("#jl_date th").eq(1).text()).css("margin-right","10px").css("width","100px");
+			    	var $jl_date_val = $("<input>").val($selected_row.children("td").eq(1).text()).attr("disabled","true");
+			    	var $jl_date_div = $("<div>").append($jl_date_label).append($jl_date_val);
+			    	
+			    	var $jl_fix_date_label = $("<label>").text($("#jl_date th").eq(2).text()).css("margin-right","10px").css("width","100px");
+			    	var $jl_fix_date_val = $("<input>").val($selected_row.children("td").eq(2).text());
+			    	var $jl_fix_date_div = $("<div>").append($jl_fix_date_label).append($jl_fix_date_val);
+			    	
+			    	var $tip = $("<div>").text("*注意：修正日期的格式必须是yyyy-mm-dd，例如2015-03-02");
+			    	
+			    	
+			    	$(".modal-body").append($jh_div).append($jl_date_div).append($jl_fix_date_div).append($tip);
+			    });
+			}); 
+  		</script>
 	</body>
 </html>

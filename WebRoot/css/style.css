@@ -379,7 +379,7 @@ select{
 #update_oper_time,
 #update_today_data{
 	margin-bottom: 15px;
-	background-color: #D8D8D8;
+	background-color: #A4A4A4;
 	padding: 50px auto;
 	height: auto;
 	position: relative;
@@ -387,6 +387,20 @@ select{
 	-webkit-border-radius: 4px;
 	-moz-border-radius: 4px;
 	border-radius: 4px;
+}
+
+#jl_date_table{
+	-webkit-user-select: none;  /* Chrome all / Safari all */
+  	-moz-user-select: none;     /* Firefox all */
+  	-ms-user-select: none;      /* IE 10+ */
+  	user-select: none;          /* Likely future */   
+	cursor: default; 
+}
+#jl_date_table thead{
+	/* background-color:#58ACFA; */
+	background: #FAFAFA;
+	background: -webkit-linear-gradient(top, #E6E6E6 0%,#FAFAFA 50%, #E6E6E6 100%); /* Chrome10+,Safari5.1+*/
+	background: linear-gradient(to bottom, #E6E6E6 0%,#FAFAFA 50%,#E6E6E6 100%); /* W3C*/
 }
 
 #update_oper_time:after,
@@ -434,3 +448,4 @@ select{
 	padding: 0 20px;
 	font-size: 12px;
 }
+

@@ -66,7 +66,6 @@
 	    		$("#warning_box").hide();  
 	    			
 	   			$("#login_btn").on("click", function(event){
-	   				console.log("in click");
 	   				event.preventDefault();
 	    			var username = $("#username").val();
 	    			var password = $("#inputPassword").val();
@@ -84,7 +83,8 @@
 							if(data.msg == "true"){
 								$.cookie("user",username);
 								$.cookie("userteam",data.userteam);
-								window.open("homepage.html?user="+username, "_self");
+								$.cookie("usertype",data.usertype);
+								window.open("homepage.html", "_self");
 							}else{
 								$("#warning_box").text("用户名或密码错误！").show();
 							}
