@@ -57,7 +57,7 @@
 		                <button id="del-row_btn" class="btn btn-default" data-toggle="modal" data-target="#del_row">Delete</button>
 		                
 		                <!-- 模态框（Modal） -->
-						<div class="modal fade" id="edit_row" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+						<div class="modal fade" id="jl_modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
 						   <div class="modal-dialog">
 						      <div class="modal-content">
 						         <div class="modal-header">
@@ -125,13 +125,20 @@
 			    	var $jl_date_div = $("<div>").append($jl_date_label).append($jl_date_val);
 			    	
 			    	var $jl_fix_date_label = $("<label>").text($("#jl_date th").eq(2).text()).css("margin-right","10px").css("width","100px");
-			    	var $jl_fix_date_val = $("<input>").val($selected_row.children("td").eq(2).text());
+			    	var $jl_fix_date_val = $("<input>").val($selected_row.children("td").eq(2).text()).attr("id","jl_fix_date");
 			    	var $jl_fix_date_div = $("<div>").append($jl_fix_date_label).append($jl_fix_date_val);
 			    	
 			    	var $tip = $("<div>").text("*注意：修正日期的格式必须是yyyy-mm-dd，例如2015-03-02");
 			    	
-			    	
 			    	$(".modal-body").append($jh_div).append($jl_date_div).append($jl_fix_date_div).append($tip);
+			    	$("#jl_modal").modal("show");
+			    });
+			    
+			    $("#submit_fix_row").on("click", function(){
+			    	var input_text = $(".modal-body input[id='jl_fix_date']").val();
+			    	var $selected_row = jl_date_table.$("tr.selected");
+			    	$selected_row.children("td").eq(3).text(input_text);
+			    	$("#jl_modal").modal("hide");
 			    });
 			}); 
   		</script>
