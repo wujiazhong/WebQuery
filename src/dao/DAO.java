@@ -111,7 +111,46 @@ public class DAO {
 		}
 		return well_index_list;
 	}*/
-
+	
+	public JSONArray getOperDateList(final String userteam){
+		JSONObject jsonObj = new JSONObject();
+		JSONArray jsonArray = new JSONArray();
+		final String well_name = "well_name";
+		final String jl_date = "jl_date";
+		final String xj_date = "xj_date";
+		
+		Connection conn = DB_Connection.getConnection(this.db_driver, this.db_url, this.db_user, this.db_pwd);
+		Statement stm= null;
+	    ResultSet rs =null;
+	    
+	    try{
+	    	String sql ="select distinct JH, JLRQ, XJRQ "
+					  + "from T_JH_T "
+					  + "where JH in (select JH from T_USERTEAM_WELL where USERTEAM = '"+userteam+"')";
+			stm = conn.createStatement();
+	        rs = stm.executeQuery(sql);
+	        
+	        while(rs.next()){
+	        	String rs_well_name = rs.getString("JH");
+        		String rs_jl_date = rs.getString("JLRQ");
+        		String rs_xj_date = rs.getString("XJRQ");
+        		
+        		try{
+	        		jsonObj.clear();
+	    			jsonObj.put(well_name, rs_well_name);
+	    			jsonObj.put(jl_date, rs_jl_date);
+	    			jsonObj.put(xj_date, rs_xj_date);
+	    			jsonArray.add(jsonObj);
+        		}catch(JSONException e){
+        			e.printStackTrace();
+        		}
+	        }
+	    }catch(SQLException e){
+	    	e.printStackTrace();
+	    }
+	    return jsonArray;
+	}
+	
 	public JSONArray getWellFixDateList(final String userteam){
 		JSONObject jsonObj = new JSONObject();
 		JSONArray jsonArray = new JSONArray();
@@ -144,7 +183,6 @@ public class DAO {
 					  + "where JH in (select JH from T_USERTEAM_WELL where USERTEAM = '"+userteam+"')";
 			stm = conn.createStatement();
 	        rs = stm.executeQuery(sql);
-	        System.out.println(sql);
 	        
 	        while(rs.next())
 	        {
