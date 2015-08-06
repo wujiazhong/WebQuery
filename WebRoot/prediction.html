@@ -1,7 +1,35 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
-<head>
-</head>
-<body>
-<h1>结蜡预测</h1>
-</body>
+	<body>
+		<center>
+			<div class="col-md-8  col-lg-5" id="multi_sel">
+  				<div class="col-md-10 col-lg-10"><label>选择叠加示功图 </label></div>
+  				<div class="col-md-12">
+	  				<select name="liOption[]" multiple="multiple" id="multi_sel_table">
+				        <option value="0">aaa</option>
+				        <option value="1">bbb</option>
+				        <option value="2">ccc</option>
+					</select>
+					<div class="col-md-offset-6 col-md-8 col-lg-8" id="sum_btn">
+	  	      			<button type="button" class="btn btn-default col-sm-offset-3 col-sm-3">叠加示功图</button>
+	  	      		</div>
+				</div>
+  			</div>
+		</center>
+		<script type="text/javascript" src="js/jquery.js"></script>
+  		<script type="text/javascript" src="js/jquery.cookie.js"></script>
+  		<script type="text/javascript" src="js/bootstrap.min.js"></script>
+    	<script type="text/javascript" src="js/method.js"></script>
+    	<script type="text/javascript" src="js/jquery.multiselect2side.js"></script>
+    	<script type="text/javascript">
+    		$(document).ready(function(){
+	    		$("#multi_sel_table").multiselect2side({
+					    selectedPosition: 'right',
+					    moveOptions: false,
+						labelsx: "待选择",
+						labeldx: "已选择"
+				});
+			});
+    	</script>
+	</body>
 </html>

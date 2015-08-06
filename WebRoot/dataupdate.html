@@ -19,7 +19,7 @@
 			</div>
 			<div class="col-md-12 container">
 				<div class="container col-md-6 col-lg-6" id="jl_date">
-					<div class="container col-md-12 container">
+					<div class="container col-md-12 table_div">
 						<table id="jl_date_table" class="display" cellspacing="0" width="100%">
 							<thead>
 								<tr>
@@ -28,40 +28,22 @@
 								</tr>
 							</thead>
 							<tbody>
-								<tr>
-									<td>A123</td>
-									<td>2014-01-23</td>
-									<td>false</td>
-								</tr>
-								<tr>
-									<td>c423</td>
-									<td>2011-01-23</td>
-									<td>false</td>
-								</tr>
-								<tr>
-									<td>p123</td>
-									<td>2013-01-23</td>
-									<td>false</td>
-								</tr>
-								<tr>
-									<td>f121</td>
-									<td>2015-01-23</td>
-									<td>false</td>
-								</tr>
 							</tbody>
 						</table>
 						<br>
-						<button id="jl_add_btn" class="btn btn-default" data-toggle="modal" data-target="#add_row">增加</button>
-		                <button id="jl_edit_btn" class="btn btn-default" data-toggle="modal" data-target="#edit_row">
-		                	编辑
-		                </button>
-		                <button id="jl_del_btn" class="btn btn-default" data-toggle="modal" data-target="#del_row">删除</button>
-		                <button id="jl_submit_btn" class="btn btn-default" data-toggle="modal" data-target="#submit_row">确定</button>
+						<div class="table_btn_group">
+							<button id="jl_add_btn" class="btn btn-default" data-toggle="modal" data-target="#add_row">增加</button>
+			                <button id="jl_edit_btn" class="btn btn-default" data-toggle="modal" data-target="#edit_row">
+			                	编辑
+			                </button>
+			                <button id="jl_del_btn" class="btn btn-default" data-toggle="modal" data-target="#del_row">删除</button>
+			                <button id="jl_submit_btn" class="btn btn-default" data-toggle="modal" data-target="#submit_row">确定</button>
+						</div>
 					</div>
 				</div>
 					
 				<div class="container col-md-6 col-lg-6" id="xj_date">
-					<div class="container col-md-12 container">
+					<div class="container col-md-12 table_div">
 						<table id="xj_date_table" class="display" cellspacing="0" width="100%">
 							<thead>
 								<tr>
@@ -70,35 +52,17 @@
 								</tr>
 							</thead>
 							<tbody>
-								<tr>
-									<td>A123</td>
-									<td>2014-01-23</td>
-									<td>false</td>
-								</tr>
-								<tr>
-									<td>c423</td>
-									<td>2011-01-23</td>
-									<td>false</td>
-								</tr>
-								<tr>
-									<td>p123</td>
-									<td>2013-01-23</td>
-									<td>false</td>
-								</tr>
-								<tr>
-									<td>f121</td>
-									<td>2015-01-23</td>
-									<td>false</td>
-								</tr>
 							</tbody>
 						</table>
 						<br>
-						<button id="xj_add_btn" class="btn btn-default" data-toggle="modal" data-target="#add_row">增加</button>
-		                <button id="xj_edit_btn" class="btn btn-default" data-toggle="modal" data-target="#edit_row">
-		                	编辑
-		                </button>
-		                <button id="xj_del_btn" class="btn btn-default" data-toggle="modal" data-target="#del_row">删除</button>
-		                <button id="xj_submit_btn" class="btn btn-default" data-toggle="modal" data-target="#submit_row">确定</button>
+						<div class="table_btn_group">
+							<button id="xj_add_btn" class="btn btn-default" data-toggle="modal" data-target="#add_row">增加</button>
+			                <button id="xj_edit_btn" class="btn btn-default" data-toggle="modal" data-target="#edit_row">
+			                	编辑
+			                </button>
+			                <button id="xj_del_btn" class="btn btn-default" data-toggle="modal" data-target="#del_row">删除</button>
+			                <button id="xj_submit_btn" class="btn btn-default" data-toggle="modal" data-target="#submit_row">确定</button>
+		        		</div>
 		        	</div>
 				</div>
 				
@@ -127,15 +91,18 @@
   		<script type="text/javascript" src="./js/jquery.cookie.js"></script>
   		<script type="text/javascript" src="js/method.js"></script>
   		<script type="text/javascript">
-  			$(document).ready(function(){ 
-  				var jl_date_table = null; 	
-  				var xj_date_table = null;
-  				  				
+  			$(document).ready(function(){  
+  				/*
+  				 *This class used to stands for date data recorded in two tables
+  				 *@ version
+  				 *@ author
+  				 */				  				
   				function jhOperDateObj(jh){
   					this.jh = jh;
   					this.jl_list = new Array();
   					this.xj_list = new Array();
   				}
+  				
   				jhOperDateObj.prototype = {
   					addItem: function(oper_type, content, isNew){
   						if(oper_type=="jl"){
@@ -144,6 +111,7 @@
   							this.xj_list.push({date:content,status:isNew});
   						}
   					},
+  					
   					editDate: function(oper_type, src_date, des_date){
   						if(oper_type=="jl"){
   							$.each(this.jl_list, function(key,val){
@@ -161,7 +129,7 @@
   							});
   						}
   					}
-  				}
+  				}//jhOperDateObj end
   				
   				$.fn.createTableHead = function(){
 					var $jh_th = $("<th>").text("井号");
@@ -191,17 +159,158 @@
        					$("<tr>").append($new_jh_td).append($new_jl_td).appendTo($("#"+table_id+" tbody"));
   					}); 
   					
-					if($.fn.dataTable.isDataTable(data_table)){
-						data_table.fnDestroy();
-					}	
-		  			var data_table = $("#"+table_id).dataTable({
+		  			$("#"+table_id).dataTable({
 		  				"searching": false,
 		  				"bInfo":false,
 		  				"bPaginate": false,
 		  				"bRetrieve": true
-		  			}); 
-		  			return data_table;				
+		  			}); 				
   				}
+  				
+				$.fn.selectSingleRow = function(){
+  					var table_id = $(this).attr("id");
+	  				$("#"+table_id+" tbody").on("click", "tr",function (){
+				        if ($(this).hasClass("selected")) {
+				            $(this).removeClass("selected");
+				        }
+				        else {
+				            $("#"+table_id+" tbody tr.selected").removeClass("selected");
+				            $(this).addClass("selected");
+				        }	  	
+				    });			
+	  			}
+		  				
+  				$.fn.editTableRowClick = function(action_abbr,action_name, table_id, input_id){
+  					$(this).on("click", function(){ 
+	  					var $selected_row =  $("#"+table_id+" tbody tr.selected");
+	  					var cur_jh = $("#jh_combobox").find("option:selected").text();
+
+				    	if(!$selected_row.length){
+				    		alert("请在表格中选择要编辑的行！");
+				    		return false;
+				    	}
+				    	
+	  					$(".modal-body").empty();
+	  					$("#myModalLabel").text("修正"+action_name+"日期");
+	  					
+	  					var $jh_label = $("<label>").text("原"+$("#"+table_id+" th").eq(0).text()).css("margin-right","10px").css("width","100px");
+	  					//var $jh_input = $("<input>").val($selected_row.children("td").eq(0).text()).attr("disabled","true");
+	  					var $jh_input = $("<input>").val(cur_jh).attr("disabled","true");
+	  					var $jh_div = $("<div>").append($jh_label).append($jh_input);
+	  					
+	  					var $date_label = $("<label>").text($("#"+table_id+" th").eq(1).text()).css("margin-right","10px").css("width","100px");
+				    	var $date_input = $("<input>").val($selected_row.children("td").eq(1).text()).attr("disabled","true");
+				    	var $date_div = $("<div>").append($date_label).append($date_input);
+				    	
+				    	var $fix_date_label = $("<label>").text("修正"+action_name+"日期").css("margin-right","10px").css("width","100px");
+				    	var $fix_date_input = $("<input placeholder='填写新的日期'>").attr("id",input_id.fix_date);
+				    	var $fix_date_div = $("<div>").append($fix_date_label).append($fix_date_input);
+				    	
+				    	var $tip = $("<div>").text("*注意：修正日期的格式必须是yyyy-mm-dd，例如2015-03-02");
+				    	
+				    	$(".modal-body").append($jh_div).append($date_div).append($fix_date_div).append($tip);
+				    	$(".modal-footer button[class*='modal_submit_btn']").remove();
+				    	$("<button type='button' class='btn btn-primary modal_submit_btn' id='edit'>").text("提交").appendTo($(".modal-footer"));
+
+				    	$(".modal").modal("show");
+				    	$("#edit").on("click",function(){
+				    		var input_text = $(".modal-body input[id='"+input_id.fix_date+"']").val();
+					    	if(!checkDate(input_text)){
+					    		return false;
+					    	}
+				    	
+					    	var src_date = $selected_row.children("td").eq(1).text();
+					    								    	
+					    	$.each(table_info_list, function(index,val){
+					    		if(val.jh == cur_jh){
+					    			val.editDate(action_abbr,src_date,input_text);
+					    			return false;
+					    		}
+					    	});
+					    	
+					    	$selected_row.children("td").eq(1).text(input_text);
+					    	$(".modal").modal("hide");	
+					    	$(".modal-body").empty();
+				    	});
+				    });
+  				}
+		  				
+  				$.fn.addTableRowClick = function(action_abbr, action_name, table_id, input_id){
+  					$(this).on("click", function(){ 
+	  					$(".modal-body").empty();
+	  					$("#myModalLabel").text("修正"+action_name+"日期");
+	  					var cur_jh = $("#jh_combobox").find("option:selected").text();
+	  					
+	  					var $jh_label = $("<label>").text($("#"+table_id+" th").eq(0).text()).css("margin-right","10px").css("width","100px");
+		  				//var $jh_input = $("<input>").attr("id", input_id.jh).attr("disabled","true");
+		  				var $jh_input = $("<input>").val(cur_jh).attr("id", input_id.jh).attr("disabled","true");
+		  				var $jh_div = $("<div>").append($jh_label).append($jh_input);
+		  				
+		  				var $date_label = $("<label>").text($("#"+table_id+" th").eq(1).text()).css("margin-right","10px").css("width","100px");
+				    	var $date_input = $("<input>").attr("id", input_id.date);
+				    	var $date_div = $("<div>").append($date_label).append($date_input);
+				    	
+				    	var $tip = $("<div>").text("*注意：1.请确保所填井队正确； 2.修正日期的格式必须是yyyy-mm-dd，例如2015-03-02");
+				    	$(".modal-body").append($jh_div).append($jh_div).append($date_div).append($tip);
+				    	$(".modal-footer button[class*='modal_submit_btn']").remove();
+				    	$("<button type='button' class='btn btn-primary modal_submit_btn' id='add'>").text("提交").appendTo($(".modal-footer"));
+					   	$(".modal").modal("show");
+					   	$("#add").on("click",function(){
+					   		var input_text = $(".modal-body input[id='"+input_id.date+"']").val();
+					    	if(!checkDate(input_text)){
+					    		return false;
+					    	}
+					    	var index = parseInt($("#"+table_id+" tbody tr").length) - 1;
+					    	var $new_tr = $("<tr>")
+					    							 
+					    	$.each($(".modal-body").find("input"), function(key, val){
+					    		var input_text = $(this).val();
+					    		var $new_td = $("<td>").text(input_text).appendTo($new_tr);
+					    	});
+					    	
+					    	$new_tr.insertAfter($("#"+table_id+" tbody").find("tr").eq(index));							    	
+					    	$.each(table_info_list, function(index,val){
+					    		if(val.jh == cur_jh){
+					    			val.addItem(action_abbr,input_text,true);
+					    			return false;
+					    		}
+					    	});
+					    	
+				  			$("#"+table_id).dataTable({
+				  				"searching": false,
+				  				"bInfo":false,
+				  				"bPaginate": false,
+				  				"bRetrieve": true
+				  			});
+
+					    	$(".modal").modal("hide");	
+					    	$(".modal-body").empty();
+					   	});
+					});
+  				}
+		  				
+		  		function getOperDateByWellName(well_name){
+           			var oper_date = [];
+           			$.each(well_info, function(index,val){
+         				if(well_name == val.well_name){
+         					oper_date = val;
+         					return false;
+         				}
+         			});
+           		}
+  				
+  				function checkDate(date){
+				    var ds=date.match(/\d+/g),ts=["getFullYear","getMonth","getDate"];
+				    var d=new Date(date.replace(/-/g,'/')),i=3;
+				    ds[1]--; //Date class, month index form 0, eg. Jan==0, Oct==9
+				    while(i--){
+				    	if( ds[i]*1!=d[ts[i]]()){
+				    		alert("所填写的修正日期错误或格式不符合要求，请检查！"); 
+				    		return false;
+				    	}
+				    }
+				    return true;
+			    }
   				
   				$.ajax({
     			  type: "post",
@@ -213,17 +322,7 @@
                         	alert("数据库中没有该井队的结蜡或洗井数据！");
                         	return false;
                         }	  	
-                        
-                  		function getOperDateByWellName(well_name){
-                  			var oper_date = [];
-                  			$.each(well_info, function(index,val){
-	               				if(well_name == val.well_name){
-	               					oper_date = val;
-	               					return false;
-	               				}
-	               			});
-                  		}
-                  		
+                                          		                  		
                   		var well_info = data;
                   		var jh_list = [];
                   		var table_info_list = new Array();
@@ -261,160 +360,15 @@
                   			
                   			$.each(table_info_list, function(index,val){
                   				if(val.jh == cur_jh){
-                  					jl_date_table = $("#jl_date_table").updateTable(val,"jl");
-                  					xj_date_table = $("#xj_date_table").updateTable(val,"xj"); 
+                  					$("#jl_date_table").updateTable(val,"jl");
+                  					$("#xj_date_table").updateTable(val,"xj"); 
                   					return false;
                   				}	
                   			});
                   		});
                   		
-                  		$("#jh_combobox").trigger("change"); 
-			  			
-			  			function checkDate(date){
-						    var ds=date.match(/\d+/g),ts=["getFullYear","getMonth","getDate"];
-						    var d=new Date(date.replace(/-/g,'/')),i=3;
-						    ds[1]--; //Date class, month index form 0, eg. Jan==0, Oct==9
-						    while(i--){
-						    	if( ds[i]*1!=d[ts[i]]()){
-						    		alert("所填写的修正日期错误或格式不符合要求，请检查！"); 
-						    		return false;
-						    	}
-						    }
-						    return true;
-					    }
-					    
-		  				function getSelectedRowIndex(data_table, table_id){
-		  					var index = 0;
-			  				var $selected_row = data_table.$("tr.selected");
-			  				
-			  				//if some row is selected, insert below that row;
-			  				//otherwise, insert below last row
-					    	if($selected_row.length){
-					    		index = jl_date_table.$("tr").index($selected_row);
-					    	}else{
-					    		index = parseInt($("#"+table_id+" tbody tr").length) - 1;
-					    	}
-					    	return index;
-		  				}
-			  			
-		  				$.fn.selectSingleRow = function(data_table){
-			  				$("#"+$(this).attr("id")+" tbody").on("click", "tr", function (){
-						        if ($(this).hasClass("selected")) {
-						            $(this).removeClass("selected");
-						        }
-						        else {
-						            data_table.$("tr.selected").removeClass("selected");
-						            $(this).addClass("selected");
-						        }	  	
-						    });			
-			  			}
-		  				
-		  				$.fn.editTableRowClick = function(data_table, action_abbr,action_name, table_id, input_id){
-		  					$(this).on("click", function(){ 
-			  					var $selected_row = data_table.$("tr.selected");
-						    	if(!$selected_row.length){
-						    		alert("请在表格中选择要编辑的行！");
-						    		return false;
-						    	}
-						    	
-			  					$(".modal-body").empty();
-			  					$("#myModalLabel").text("修正"+action_name+"日期");
-			  					
-			  					var $jh_label = $("<label>").text("原"+$("#"+table_id+" th").eq(0).text()).css("margin-right","10px").css("width","100px");
-			  					var $jh_input = $("<input>").val($selected_row.children("td").eq(0).text()).attr("disabled","true");
-			  					var $jh_div = $("<div>").append($jh_label).append($jh_input);
-			  					
-			  					var $date_label = $("<label>").text($("#"+table_id+" th").eq(1).text()).css("margin-right","10px").css("width","100px");
-						    	var $date_input = $("<input>").val($selected_row.children("td").eq(1).text()).attr("disabled","true");
-						    	var $date_div = $("<div>").append($date_label).append($date_input);
-						    	
-						    	var $fix_date_label = $("<label>").text("修正"+action_name+"日期").css("margin-right","10px").css("width","100px");
-						    	var $fix_date_input = $("<input placeholder='填写新的日期'>").attr("id",input_id.fix_date);
-						    	var $fix_date_div = $("<div>").append($fix_date_label).append($fix_date_input);
-						    	
-						    	var $tip = $("<div>").text("*注意：修正日期的格式必须是yyyy-mm-dd，例如2015-03-02");
-						    	
-						    	$(".modal-body").append($jh_div).append($date_div).append($fix_date_div).append($tip);
-						    	$(".modal-footer button[class*='modal_submit_btn']").remove();
-						    	$("<button type='button' class='btn btn-primary modal_submit_btn' id='edit'>").text("提交").appendTo($(".modal-footer"));
-		
-						    	$(".modal").modal("show");
-						    	$("#edit").on("click",function(){
-						    		var input_text = $(".modal-body input[id='"+input_id.fix_date+"']").val();
-							    	if(!checkDate(input_text)){
-							    		return false;
-							    	}
-						    	
-							    	var $selected_row = data_table.$("tr.selected");
-							    	var src_date = $selected_row.children("td").eq(1).text();
-							    	var cur_jh = $selected_row.children("td").eq(1).text();
-							    	
-							    	$.each(table_info_list, function(index,val){
-							    		if(val.jh == cur_jh){
-							    			val.editDate(action_abbr,src_date,input_text);
-							    			return false;
-							    		}
-							    	});
-							    	
-							    	$selected_row.children("td").eq(1).text(input_text);
-							    	$(".modal").modal("hide");	
-							    	$(".modal-body").empty();
-						    	});
-						    });
-		  				}
-		  				
-		  				$.fn.addTableRowClick = function(data_table,action_abbr, action_name, table_id, input_id){
-		  					$(this).on("click", function(){ 
-			  					$(".modal-body").empty();
-			  					$("#myModalLabel").text("修正"+action_name+"日期");
-			  					
-			  					var $jh_label = $("<label>").text($("#"+table_id+" th").eq(0).text()).css("margin-right","10px").css("width","100px");
-				  				var $jh_input = $("<input>").attr("id", input_id.jh);
-				  				var $jh_div = $("<div>").append($jh_label).append($jh_input);
-				  				
-				  				var $date_label = $("<label>").text($("#"+table_id+" th").eq(1).text()).css("margin-right","10px").css("width","100px");
-						    	var $date_input = $("<input>").attr("id", input_id.date);
-						    	var $date_div = $("<div>").append($date_label).append($date_input);
-						    	
-						    	var $tip = $("<div>").text("*注意：1.请确保所填井队正确； 2.修正日期的格式必须是yyyy-mm-dd，例如2015-03-02");
-						    	$(".modal-body").append($jh_div).append($jh_div).append($date_div).append($tip);
-						    	$(".modal-footer button[class*='modal_submit_btn']").remove();
-						    	$("<button type='button' class='btn btn-primary modal_submit_btn' id='add'>").text("提交").appendTo($(".modal-footer"));
-							   	$(".modal").modal("show");
-							   	$("#add").on("click",function(){
-							   		var input_text = $(".modal-body input[id='"+input_id.date+"']").val();
-							    	if(!checkDate(input_text)){
-							    		return false;
-							    	}
-							    	var sel_row_index = getSelectedRowIndex(data_table, table_id);
-							    	var $new_tr = $("<tr>")
-							    	$.each($(".modal-body").find("input"), function(key, val){
-							    		var input_text = $(this).val();
-							    		var $new_td = $("<td>").text(input_text).appendTo($new_tr);
-							    	});
-							    	data_table.fnDestroy();
-							    	$new_tr.insertAfter($("#"+table_id+" tbody").find("tr").eq(sel_row_index));
-							    	
-							    	$.each(table_info_list, function(index,val){
-							    		if(val.jh == cur_jh){
-							    			val.editDate(action_abbr,src_date,input_text);
-							    			return false;
-							    		}
-							    	});
-							    	
-						  			data_table = $("#"+table_id).dataTable({
-						  				"searching": false,
-						  				"bInfo":false,
-						  				"bPaginate": false,
-						  				"bRetrieve": true
-						  			});
-						  			data_table.fnDraw();
-							    	$(".modal").modal("hide");	
-							    	$(".modal-body").empty();
-							   	});
-							});
-		  				}
-		  				
+                  		$("#jh_combobox").trigger("change");   			
+		  					  				
 			  			//set jl_date_table single select
 			  			function input(jh,date,fix_date){
 			  				this.jh = jh;
@@ -422,14 +376,14 @@
 			  				this.fix_date = fix_date;
 			  			}
 			  			var jl_input_id = new input("jh","jl_date","jl_fix_date");
-			  			$("#jl_date_table").selectSingleRow(jl_date_table);
-			  			$("#jl_date button[id='jl_edit_btn']").editTableRowClick(jl_date_table,"jl","结蜡","jl_date_table", jl_input_id);
-			  			$("#jl_date button[id='jl_add_btn']").addTableRowClick(jl_date_table, "jl","结蜡","jl_date_table",jl_input_id);	
+			  			$("#jl_date_table").selectSingleRow();
+			  			$("#jl_date button[id='jl_edit_btn']").editTableRowClick("jl","结蜡","jl_date_table", jl_input_id);
+			  			$("#jl_date button[id='jl_add_btn']").addTableRowClick("jl","结蜡","jl_date_table",jl_input_id);	
 						
 						var xj_input_id = new input("jh","xj_date","xj_fix_date");
-			  			$("#xj_date_table").selectSingleRow(xj_date_table);
-			  			$("#xj_date button[id='xj_edit_btn']").editTableRowClick(xj_date_table,"xj","洗井","xj_date_table", xj_input_id);
-			  			$("#xj_date button[id='xj_add_btn']").addTableRowClick(xj_date_table, "xj","洗井","xj_date_table",xj_input_id);
+			  			$("#xj_date_table").selectSingleRow();
+			  			$("#xj_date button[id='xj_edit_btn']").editTableRowClick("xj","洗井","xj_date_table", xj_input_id);
+			  			$("#xj_date button[id='xj_add_btn']").addTableRowClick("xj","洗井","xj_date_table",xj_input_id);
 			  		},
 			  		error: function(){
 			  			alert("向数据库请求数据失败！");

@@ -238,7 +238,7 @@ public class DAO {
 	        		e.printStackTrace();
 	        	}
 	        }
-	        System.out.println("array size"+jsonArray.size());
+
 		}catch(SQLException e){
 			e.printStackTrace();
 		}finally{
