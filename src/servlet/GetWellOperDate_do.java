@@ -10,15 +10,15 @@ import javax.servlet.http.HttpServletResponse;
 
 import dao.DAO;
 import net.sf.json.JSONException;
-import net.sf.json.JSONObject;
-import t_user.T_User;
+/*import net.sf.json.JSONObject;*/
+import net.sf.json.JSONArray;
 
-public class Login_do extends HttpServlet {
+public class GetWellOperDate_do extends HttpServlet {
 	private static final long serialVersionUID = 1L;  
 	/**
 	 * Constructor of the object.
 	 */
-	public Login_do() {
+	public GetWellOperDate_do() {
 		super();
 	}
 
@@ -58,39 +58,23 @@ public class Login_do extends HttpServlet {
 	public void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		// TODO Auto-generated method stub
-		String name=request.getParameter("username");
-		String pwd=request.getParameter("password");
 		request.setCharacterEncoding("utf-8"); 
 		response.setCharacterEncoding("utf-8");
 		response.setContentType("text/html; charset=utf-8");
+		final String userteam = request.getParameter("userteam");
+
+		DAO t_userteam_well_query = new DAO();
+		JSONArray oper_date = t_userteam_well_query.getOperDateList(userteam);
 		
-		DAO t_user_query = new DAO();
-		try{
-			String check_status = t_user_query.verifyUser(name, pwd) ? "true" : "false";
-			try{
-				T_User user = t_user_query.queryUserInfo(name);
-				JSONObject jsonObj = new JSONObject();
-				try {
-					jsonObj.put("msg", check_status); 
-					jsonObj.put("userteam", user.getUserTeam());
-					jsonObj.put("usertype", user.getUserType());
-					jsonObj.put("unioncode", user.getUnionCode());
-					
-					PrintWriter out = response.getWriter();
-					out.write(jsonObj.toString());
-					out.flush();
-					out.close();
-					out = null;
-				} catch (JSONException e) {
-					e.printStackTrace();
-				}
-			}catch(Exception e){
-				e.printStackTrace();
-			}
-		}catch(Exception e){
+		try {
+			PrintWriter out = response.getWriter();
+			out.write(oper_date.toString());
+			out.flush();
+			out.close();
+			out = null;
+		} catch (JSONException e) {
 			e.printStackTrace();
 		}
-		
 	}
 
 	/**

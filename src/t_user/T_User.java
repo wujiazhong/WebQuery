@@ -7,6 +7,7 @@ public class T_User {
 	private String usertype;
 	private String name;
 	private String gender;
+	private String unioncode;
 	
 	public T_User(final String user){		
 		setUserName(username);
@@ -32,6 +33,12 @@ public class T_User {
 	public void setUserTeam(final String userteam){
 		this.userteam = userteam;
 	}
+	public String getUnionCode(){
+		return this.unioncode;
+	}
+	public void setUnionCode(final String unioncode){
+		this.unioncode = unioncode;
+	}
 	
 	public String getUserType(){
 		return this.usertype;
@@ -53,4 +60,5 @@ public class T_User {
 	public void setGender(final String gender){
 		this.gender = gender;
 	}
+
 }

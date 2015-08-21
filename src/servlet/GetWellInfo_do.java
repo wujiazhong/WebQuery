@@ -58,10 +58,10 @@ public class GetWellInfo_do extends HttpServlet {
 	public void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		// TODO Auto-generated method stub
-		String userteam = request.getParameter("userteam");
 		request.setCharacterEncoding("utf-8"); 
 		response.setCharacterEncoding("utf-8");
 		response.setContentType("text/html; charset=utf-8");
+		final String userteam = request.getParameter("userteam");
 
 		DAO t_userteam_well_query = new DAO();
 		JSONArray well_fix_date_list = t_userteam_well_query.getWellFixDateList(userteam);

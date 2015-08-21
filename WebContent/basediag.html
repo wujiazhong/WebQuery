@@ -2,34 +2,26 @@
 <html>
 	<body>
 		<center>
-		  <a id="open_btn" data-reveal-id="myModal" style="display:none"></a>
-		  <div id="myModal" class="reveal-modal">
+			<a id="open_btn" data-reveal-id="myModal" style="display:none"></a>
+		    <div id="myModal" class="reveal-modal">
 		  		<h2>正在向数据库请求数据，请稍候！</h2>
 		  		<img src="img/wait.gif"/>
 				<a id="close_btn" class="close-reveal-modal" style="display:none"></a>
-		  </div>	
-		  <ul class="nav nav-tabs">
-			    <li class="active" id="base_diag_view"><a href="#diag_sel" data-toggle="tab">选择基准示功图</a></li>
-			    <li id="sum_diag_view"><a href="#diag_combo" data-toggle="tab">示功图叠加</a></li>
-		  </ul>
-		  <div class="tab-content">
-			  <div class="tab-pane active" id="diag_sel">
+		    </div>	
+			<div class="tab-pane active" id="diag_sel">
 			  	<div class="col-md-12 container">
 			  		<div class="container col-md-12" id="combobox_group_sel">
-			  			  <br>	
-			  			  <div class="col-lg-offset-1 col-md-6 col-lg-4">
+			  			  <div class="col-lg-offset-2 col-md-6 col-lg-4">
 				  			  	<div class="col-md-12">
 				  			  		<label class="col-md-5 col-lg-5">选择井号： </label>
 									<select class="selectpicker col-md-4 col-lg-4" id="well_index"></select>
 				  			  	</div>
 				  			  	<div class="col-md-12">
-				  			  		<label class="col-md-5 col-lg-5">选择基准日期： </label>
+				  			  		<label class="col-md-5 col-lg-5">选择修井记录： </label>
 									<select class="selectpicker  col-md-4 col-lg-4" id="well_check_date"></select>
 				  			  	</div>
 			  			  </div>
-					      <div class="container col-md-1 col-lg-1" id="r_arrow">
-					      	<img src="img/right_arrow.png" height="30px" width="30px"/>
-					      </div>
+
 					      <div class="col-md-5 col-lg-5">
 						      <div class="col-md-12">
 							  	<label class="col-md-5 col-lg-5">措施名称： </label>
@@ -40,80 +32,19 @@
 							  	<span class="label label-info col-md-6 col-lg-3" id="well_content"></span>
 						  	  </div>
 					  	  </div>
-					  	  <br>
 					  	  <div class="col-md-12" id="ok_btn">
-				  	      	<button type="button" class="btn btn-default col-md-offset-5 col-md-1">确定</button>
+				  	      	<button id="fix_date_btn" type="button" class="btn btn-default col-md-offset-5 col-md-2 col-lg-2">确定修井记录</button>
 				  	      </div>
 				  	</div>
 			  	    
 			  	</div>
-			  		<div class="container col-md-12" id="table_container">
-			  			<table class="table">
-						   <thead>
-						      <tr>
-						         <th>名称</th>
-						         <th>城市</th>
-						         <th>城市</th>
-						         <th>城市</th>
-						         <th>城市</th>
-						      </tr>
-						   </thead>
-						   <tbody>
-						      <tr>
-						         <td>Tanmay</td>
-						         <td>Bangalore</td>
-						         <td>Tanmay</td>
-						         <td>Bangalore</td>
-						         <td>Tanmay</td>
-						      </tr>
-						      <tr>
-						         <td>Sachin</td>
-						         <td>Mumbai</td>
-						      </tr>
-						      <tr>
-						         <td>Tanmay</td>
-						         <td>Bangalore</td>
-						      </tr>
-						      <tr>
-						         <td>Tanmay</td>
-						         <td>Bangalore</td>
-						      </tr>
-						      <tr>
-						         <td>Tanmay</td>
-						         <td>Bangalore</td>
-						      </tr>
-						   </tbody>
-						</table>
-			  		</div>
-			  </div>
-			  <div class="tab-pane" id="diag_combo">
-			  	<div class="col-md-12 container">
-			  		<div class="container col-md-12"  id="combobox_group_combo">
-			  			<br>
-			  			<div class="col-md-6  col-lg-4">
-			  				<label>选择井号： </label>
-							<select class="selectpicker" id="well_index_combo"></select>
-							<label>&nbsp;&nbsp;&nbsp;&nbsp;基准日期： </label>
-							<span class="label label-info" id="base_date" size="5"></span>
-						</div>
-						<br><br>
-						<div class="col-md-8  col-lg-5" id="multi_sel">
-			  				<div class="col-md-10 col-lg-10"><label>选择叠加示功图 </label></div>
-			  				<div class="col-md-12">
-				  				<select name="liOption[]" multiple="multiple" id="multi_sel_table">
-							        <option value="0">aaa</option>
-							        <option value="1">bbb</option>
-							        <option value="2">ccc</option>
-								</select>
-								<div class="col-md-offset-6 col-md-8 col-lg-8" id="sum_btn">
-				  	      			<button type="button" class="btn btn-default col-sm-offset-3 col-sm-3">叠加示功图</button>
-				  	      		</div>
-							</div>
-			  			</div>
-			  		</div>
-			  	</div>
-			  </div>
-		  </div>
+		  		<div class="container col-md-12" id="diag_container">
+		  			
+		  		</div>
+		  		<div>
+		  			<button id="submit_diag_base" type="button" class="btn btn-default col-md-offset-5 col-md-2 col-lg-2" style="margin-bottom: 50px;display:none;">设定基准示功图</button>
+		  		</div>
+			</div>
 		</center>
 		
 		<script type="text/javascript" src="js/jquery.js"></script>
@@ -122,17 +53,12 @@
     	<script type="text/javascript" src="js/method.js"></script>
     	<script type="text/javascript" src="js/jquery.multiselect2side.js"></script>
     	<script type="text/javascript" src="js/browser.js"></script>
-    	<script type="text/javascript">
-    		var well_info = [];
-    		var well_index_list = [];
+    	<script type="text/javascript">	
     		$(document).ready(function(){
+    			var well_info = [];
+        		var well_index_list = [];
+        		var cognos_diag_url = "http://9.110.83.168/ibmcognos/cgi-bin/cognos.cgi?b_action=cognosViewer&ui.action=run&ui.object=%2fcontent%2fpackage[%40name%3d%27PMQXJ%27]%2ffolder[%40name%3d%27yulong%27]%2freport[%40name%3d%27shigongtu_test%27]&ui.name=shigongtu_test&run.outputFormat=&run.prompt=false&p_pDiagram_ID=diag_id&cv.toolbar=false&cv.header=false" 
     			$("<span>").text($.cookie("userteam")).appendTo($("#container_title div[id='userteam']"));
-    			$("#multi_sel_table").multiselect2side({
-				    selectedPosition: 'right',
-				    moveOptions: false,
-					labelsx: "待选择",
-					labeldx: "已选择"
-			    });
     			function sortDescend(menu_list){
     				var reg = /[^0-9]/ig;
     				var list = menu_list;
@@ -148,12 +74,17 @@
 					return list;
     			}
     			
-    			function initSelectMenu(menu_list, select_menu_id){
-    				$("#"+select_menu_id).empty();
- 					for(key in menu_list){
- 						var $opt = $("<option>").attr("value", (parseInt(key)+1).toString()).text(menu_list[key]); 
-						$("#"+select_menu_id).append($opt);
- 					}
+    			function sortAscend(data_list, key){
+    				var reg = /[^0-9]/ig;
+    				for(var i=0;i<data_list.length;i++){
+    					for(var j=data_list.length-1;j>i;j--){
+    						if(parseInt(data_list[j][key].replace(reg,"")) < parseInt(data_list[j-1][key].replace(reg,""))){
+    							temp = data_list[j-1];
+    							data_list[j-1] = data_list[j];
+    							data_list[j] = temp;
+    						}
+    					}
+    				}
     			}
     			
     			function getCheckDateList(well_name, data){
@@ -259,6 +190,46 @@
                         }, 1000);
                         window.open("homepage.html?user="+$.cookie("user"));
                   }
+    			});
+    			
+    			$("#fix_date_btn").on('click', function(){
+    				var well_name = $("#well_index").find("option:selected").text();
+    				var well_date = $("#well_check_date").find("option:selected").text();
+    				$("#diag_container").empty();
+    				$.ajax({
+	   	    			  type: "post",
+	   	                  url:  "GetDiagID_do",
+	   	                  data: {"unioncode": $.cookie("unioncode"),"well_name":well_name,"well_date":well_date},
+	   	                  dataType: "json",
+	   	                  success: function(data){
+	   	                	if(data.length == 0){
+	   	                		alert("数据库没有找到该井号在这天的修井记录");								
+							}else{
+								sortAscend(data,"date");
+								$.each(data,function(key, data_val){
+									var $row = $("<div>").addClass("diag_row").addClass("col-md-12").appendTo("#diag_container");
+									var $date_div = $("<div>").addClass("date_div").addClass("col-md-2 col-lg-2").text(data_val.date).appendTo($row);
+									var $img_div = $("<div>").addClass("img_div").addClass("col-md-12").appendTo($row);
+									for(var i=0;i<data_val.time.length;i++){
+										var cur_img_url = cognos_diag_url.replace(/diag_id/,data_val.diag_id[i]);
+										var $diag_div = $("<div class='diag_div'>").addClass("container col-md-3 col-lg-3").appendTo($img_div);
+										
+										var $warpper = $("<div>").addClass("diag_wrapper").appendTo($diag_div);
+										var iframe_style = "-webkit-transform:scale(0.5,0.5);-moz-transform: scale(0.5,0.5);-transform:scale(0.5,0.5); -ms-transform:scale(0.5,0.5); -o-transform:scale(0.5,0.5);";
+										var $img_iframe = $("<iframe src='"+cur_img_url+"'>").attr("style",iframe_style).appendTo($warpper);
+										
+										var $radio_label = $("<label>").appendTo($diag_div);
+										var $radio_btn = $("<input type='radio'>").appendTo($radio_label);
+										var $p = $("<p>").text(data_val.time[i]).appendTo($radio_label);
+									}
+								});
+								$("#submit_diag_base").show();
+							}
+	   	                  },
+	   	                  error: function(){
+	   	                	  
+	   	                  }
+    				});	   	          
     			});
     			
     		});

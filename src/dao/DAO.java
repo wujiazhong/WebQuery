@@ -7,6 +7,8 @@ import t_user.T_User;
 import net.sf.json.JSONException;
 import net.sf.json.JSONObject;
 import net.sf.json.JSONArray;
+import java.util.regex.*;
+import java.util.ArrayList;
 /*import java.util.Date;
 import java.util.Calendar;
 import java.text.SimpleDateFormat;*/
@@ -55,6 +57,7 @@ public class DAO {
 		Connection conn = DB_Connection.getConnection(this.db_driver, this.db_url, this.db_user, this.db_pwd);
 		Statement stm= null;
 	    ResultSet rs =null;
+	    ResultSet rs_union_code = null;
 	    T_User user = new T_User(username);
 	    
 	    try{
@@ -67,12 +70,20 @@ public class DAO {
 	        	user.setUserType(rs.getString("USERTYPE"));
 	        	user.setName(rs.getString("NAME"));
 	        	user.setGender(rs.getString("GENDER"));
+	        	
+	        	sql ="select distinct UNION_CODE from T_PREDICT where USERTEAM='"+user.getUserTeam()+"'";
+	        	rs_union_code = stm.executeQuery(sql);
+	        	
+	        	if(rs_union_code.next()){
+	        		user.setUnionCode(rs_union_code.getString("UNION_CODE"));
+	        	}
 	        }
 		}catch(SQLException e){
 			e.printStackTrace();
 		}finally{
 			try{
 				rs.close();
+				rs_union_code.close();
 				stm.close();
 				conn.close();
 			}catch(SQLException e){
@@ -111,7 +122,46 @@ public class DAO {
 		}
 		return well_index_list;
 	}*/
-
+	
+	public JSONArray getOperDateList(final String userteam){
+		JSONObject jsonObj = new JSONObject();
+		JSONArray jsonArray = new JSONArray();
+		final String well_name = "well_name";
+		final String jl_date = "jl_date";
+		final String xj_date = "xj_date";
+		
+		Connection conn = DB_Connection.getConnection(this.db_driver, this.db_url, this.db_user, this.db_pwd);
+		Statement stm= null;
+	    ResultSet rs =null;
+	    
+	    try{
+	    	String sql ="select distinct JH, JLRQ, XJRQ "
+					  + "from T_JH_T "
+					  + "where JH in (select JH from T_USERTEAM_WELL where USERTEAM = '"+userteam+"')";
+			stm = conn.createStatement();
+	        rs = stm.executeQuery(sql);
+	        
+	        while(rs.next()){
+	        	String rs_well_name = rs.getString("JH");
+        		String rs_jl_date = rs.getString("JLRQ");
+        		String rs_xj_date = rs.getString("XJRQ");
+        		
+        		try{
+	        		jsonObj.clear();
+	    			jsonObj.put(well_name, rs_well_name);
+	    			jsonObj.put(jl_date, rs_jl_date);
+	    			jsonObj.put(xj_date, rs_xj_date);
+	    			jsonArray.add(jsonObj);
+        		}catch(JSONException e){
+        			e.printStackTrace();
+        		}
+	        }
+	    }catch(SQLException e){
+	    	e.printStackTrace();
+	    }
+	    return jsonArray;
+	}
+	
 	public JSONArray getWellFixDateList(final String userteam){
 		JSONObject jsonObj = new JSONObject();
 		JSONArray jsonArray = new JSONArray();
@@ -144,7 +194,6 @@ public class DAO {
 					  + "where JH in (select JH from T_USERTEAM_WELL where USERTEAM = '"+userteam+"')";
 			stm = conn.createStatement();
 	        rs = stm.executeQuery(sql);
-	        System.out.println(sql);
 	        
 	        while(rs.next())
 	        {
@@ -200,7 +249,7 @@ public class DAO {
 	        		e.printStackTrace();
 	        	}
 	        }
-	        System.out.println("array size"+jsonArray.size());
+
 		}catch(SQLException e){
 			e.printStackTrace();
 		}finally{
@@ -217,6 +266,191 @@ public class DAO {
 		return jsonArray;
 	}
 	
+	public JSONArray getDiagID(final String unioncode, final String fix_date, final String jh){
+		JSONObject jsonObj = new JSONObject();
+		JSONArray jsonArray = new JSONArray();
+		final String date = "date";
+		final String time = "time";
+		final String diag_id = "diag_id";
+		
+		Connection conn = DB_Connection.getConnection(this.db_driver, this.db_url, this.db_user, this.db_pwd);
+		Statement stm= null;
+	    ResultSet rs =null;
+	    
+	    try{
+			String sql ="select distinct DIAGRAM_ID, P03 "
+					  + "from T_DBAT2070 "
+					  + "where P01 = '"+unioncode+"' and P02='"+jh+"' and P03>'"+fix_date+"' order by P03";
+			stm = conn.createStatement();
+	        rs = stm.executeQuery(sql);
+	        
+	        final int MAX_DIAG_FOR_ONE_DAY = 4; //每天最多显示4幅图
+	        final int MAX_DATE = 5; //最多显示5天
+	        ArrayList<String> max_diag_list = new ArrayList<String>();
+	        while(rs.next()){
+	        	String rs_fix_date = rs.getString("P03");
+	        	String rs_diag_id = rs.getString("DIAGRAM_ID");
+	        	String pattern = "(\\d{4}-\\d{2}-\\d{2})\\s(\\d{2}:\\d{2}:\\d{2})";
+	        	Pattern reg = Pattern.compile(pattern);
+	        	Matcher m = reg.matcher(rs_fix_date);
+	        	if(m.groupCount() != 2){
+	        		System.out.println("Wrong format of COLLECT_DATETIME in database");
+	        		continue;
+	        	}
+	        	
+	        	boolean isContinue = (m.find() && m.group(1).equals(fix_date)) || (max_diag_list.contains(m.group(1)));
+	        	if(isContinue){
+	        		continue;
+	        	}
+	        	
+	        	boolean isSameDay = false;
+        		for(int i=0;i<jsonArray.size();i++){
+        			JSONObject temp_obj = (JSONObject)jsonArray.get(i);
+        			if(m.group(1).equals(temp_obj.getString(date))){
+        				isSameDay = true;
+        				String str_time = temp_obj.getString(time);
+        				str_time += ","+m.group(2);
+        				temp_obj.put(time, str_time);
+        				
+        				String str_diag_id = temp_obj.getString(diag_id);
+        				str_diag_id += ","+rs_diag_id;
+        				temp_obj.put(diag_id, str_diag_id);
+        				
+        				if(str_time.split(",").length == MAX_DIAG_FOR_ONE_DAY){
+        					max_diag_list.add(m.group(1));
+        				}
+        			}
+        		}
+        		if(!isSameDay)
+        		{
+		        	try{
+		        		jsonObj.clear();
+	        			jsonObj.put(date, m.group(1));
+	        			jsonObj.put(time, m.group(2));
+	        			jsonObj.put(diag_id, rs_diag_id);
+	        			jsonArray.add(jsonObj);
+		        	}catch(JSONException e){
+		        		e.printStackTrace();
+		        	}
+        		}
+        		
+        		if(jsonArray.size() == MAX_DATE)
+        			break;
+	        }
+	        for(int i=0;i<jsonArray.size();i++){
+	        	try{
+		        	JSONObject json_item = jsonArray.getJSONObject(i);
+		        	String str_time = json_item.getString(time);
+		        	json_item.put(time, str_time.split(","));
+		        	
+		        	String str_diag_id = json_item.getString(diag_id);
+		        	json_item.put(diag_id, str_diag_id.split(","));
+	        	}catch(JSONException e){
+	        		e.printStackTrace();
+	        	}
+	        }
+	    }catch(SQLException e){
+			e.printStackTrace();
+		}finally{
+			try{
+				rs.close();
+				stm.close();
+				conn.close();
+			}catch(SQLException e){
+				System.out.println("there is a sql error!");
+				e.printStackTrace();
+			}
+		}
+	    return jsonArray;
+	}
+/*	public JSONArray getIndicatorID(final String userteam){
+		JSONObject jsonObj = new JSONObject();
+		JSONArray jsonArray = new JSONArray();
+		String well_name = "well_name";
+		String base_date = "base_date";
+		String fix_date = "fix_date";
+		
+		Connection conn = DB_Connection.getConnection(this.db_driver, this.db_url, this.db_user, this.db_pwd);
+		Statement stm= null;
+	    ResultSet rs =null;
+		
+	    try{
+			String sql ="select distinct JH, CSMC, SGNR, WGRQ "
+					  + "from T_DDCC03 "
+					  + "where INDICATOR_OVERLAP_ID in (select INDICATOR_OVERLAP_ID from T_INDI_ADD_MAIN where USERTEAM = '"+userteam+"')";
+			stm = conn.createStatement();
+	        rs = stm.executeQuery(sql);
+	        
+	        while(rs.next())
+	        {
+	        	String rs_well_name = rs.getString("JH");
+        		String rs_check_date = rs.getString("WGRQ");
+        		String rs_csmc = rs.getString("CSMC");
+        		String rs_sgnr = rs.getString("SGNR");
+        		boolean isSameWell = false;
+        		
+        		for(int i=0;i<jsonArray.size();i++){
+        			JSONObject temp_obj = (JSONObject)jsonArray.get(i);
+        			if(rs_well_name.equals(temp_obj.getString(well_name))){
+        				isSameWell = true;
+        				
+        				String str_date = temp_obj.getString(check_date);
+        				str_date += ","+rs_check_date;
+        				temp_obj.put(check_date, str_date);
+        				
+        				String str_csmc = temp_obj.getString(csmc);
+        				str_csmc += ","+rs_csmc;
+        				temp_obj.put(csmc, str_csmc);
+        				
+        				String str_sgnr = temp_obj.getString(sgnr);
+        				str_sgnr += ","+rs_sgnr;
+        				temp_obj.put(sgnr, str_sgnr);
+        			}
+        		}
+        		if(!isSameWell)
+        		{
+		        	try{
+		        		jsonObj.clear();
+	        			jsonObj.put(well_name, rs_well_name);
+	        			jsonObj.put(check_date, rs_check_date);
+	        			jsonObj.put(csmc, rs_csmc);
+	        			jsonObj.put(sgnr, rs_sgnr);
+	        			jsonArray.add(jsonObj);
+		        	}catch(JSONException e){
+		        		e.printStackTrace();
+		        	}
+        		}
+	        }
+	        
+	        for(int i=0;i<jsonArray.size();i++){
+	        	try{
+		        	JSONObject json_item = jsonArray.getJSONObject(i);
+		        	String str_check_date = json_item.getString(check_date);
+		        	json_item.put(check_date, str_check_date.split(","));
+		        	String str_csmc = json_item.getString(csmc);
+		        	json_item.put(csmc, str_csmc.split(","));
+		        	String str_sgnr = json_item.getString(sgnr);
+		        	json_item.put(sgnr, str_sgnr.split(","));
+	        	}catch(JSONException e){
+	        		e.printStackTrace();
+	        	}
+	        }
+
+		}catch(SQLException e){
+			e.printStackTrace();
+		}finally{
+			try{
+				rs.close();
+				stm.close();
+				conn.close();
+			}catch(SQLException e){
+				System.out.println("there is a sql error!");
+				e.printStackTrace();
+			}
+		}
+
+		return jsonArray;
+	}*/
 	/*public JSONArray getWellOperation(final JSONArray well_name_list){
 		JSONObject jsonObj = new JSONObject();
 		JSONArray jsonArray = new JSONArray();
