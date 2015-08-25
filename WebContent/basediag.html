@@ -1,0 +1,276 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+	<body>
+		<center>
+			<a id="open_btn" data-reveal-id="myModal" style="display:none"></a>
+		    <div id="myModal" class="reveal-modal">
+		  		<h2>正在向数据库请求数据，请稍候！</h2>
+		  		<img src="img/wait.gif"/>
+				<a id="close_btn" class="close-reveal-modal" style="display:none"></a>
+		    </div>	
+			<div class="tab-pane active" id="diag_sel">
+			  	<div class="col-md-12 container">
+			  		<div class="container col-md-12" id="combobox_group_sel">
+			  			  <div class="col-lg-offset-2 col-md-6 col-lg-4">
+				  			  	<div class="col-md-12">
+				  			  		<label class="col-md-5 col-lg-5">选择井号： </label>
+									<select class="selectpicker col-md-4 col-lg-5" id="well_index"></select>
+				  			  	</div>
+				  			  	<div class="col-md-12">
+				  			  		<label class="col-md-5 col-lg-5">选择修井记录： </label>
+									<select class="selectpicker  col-md-4 col-lg-5" id="well_check_date"></select>
+				  			  	</div>
+			  			  </div>
+
+					      <div class="col-md-5 col-lg-5">
+						      <div class="col-md-12">
+							  	<label class="col-md-5 col-lg-5">措施名称： </label>
+							  	<span class="label label-info col-md-6 col-lg-3" id="well_oper"></span>
+						  	  </div>
+						  	  <div class="col-md-12">
+							  	<label class="col-md-5 col-lg-5">措施内容： </label>
+							  	<span class="label label-info col-md-6 col-lg-3" id="well_content"></span>
+						  	  </div>
+					  	  </div>
+					  	  <div class="col-md-12" id="ok_btn">
+				  	      	<button id="fix_date_btn" type="button" class="btn btn-default col-md-offset-5 col-md-2 col-lg-2">确定修井记录</button>
+				  	      </div>
+				  	</div>
+			  	    
+			  	</div>
+		  		<div class="container col-md-12" id="diag_container">
+		  			
+		  		</div>
+		  		<div>
+		  			<button id="submit_diag_base" type="button" class="btn btn-default col-md-offset-5 col-md-2 col-lg-2" style="margin-bottom: 50px;display:none;">设定基准示功图</button>
+		  		</div>
+			</div>
+		</center>
+		
+		<script type="text/javascript" src="js/jquery.js"></script>
+  		<script type="text/javascript" src="js/jquery.cookie.js"></script>
+  		<script type="text/javascript" src="js/jquery.reveal.js"></script>
+    	<script type="text/javascript" src="js/method.js"></script>
+    	<script type="text/javascript" src="js/jquery.multiselect2side.js"></script>
+    	<script type="text/javascript" src="js/browser.js"></script>
+    	<script type="text/javascript">	
+    		$(document).ready(function(){
+    			alert($(window).width());
+    			var well_info = [];
+        		var well_index_list = [];
+        		var cognos_diag_url_test2 = "http://9.110.83.168/ibmcognos/cgi-bin/cognos.cgi?b_action=cognosViewer&ui.action=run&ui.object=%2fcontent%2ffolder[%40name%3d'PMQ_WELL']%2ffolder[%40name%3d'INDICATOR']%2freport[%40name%3d'Indi_diagram1']&ui.name=test&run.outputFormat=&run.prompt=false&p_pDiagram_ID=11433&cv.toolbar=false&cv.header=false";  
+        		var cognos_diag_url = "http://9.110.83.168/ibmcognos/cgi-bin/cognos.cgi?b_action=cognosViewer&ui.action=run&ui.object=%2fcontent%2ffolder%5b%40name%3d%27PMQ_WELL%27%5d%2ffolder%5b%40name%3d%27INDICATOR%27%5d%2freport%5b%40name%3d%27Indi_diagram1%27%5d&ui.name=Indi_diagramreport_id&&run.outputFormat=&run.prompt=false&p_pDiagram_ID=diag_id&cv.toolbar=false&cv.header=false";
+        		//var cognos_diag_url_test = "http://9.110.83.168/ibmcognos/cgi-bin/cognos.cgi?b_action=cognosViewer&ui.action=view&ui.object=defaultOutput(%2fcontent%2ffolder[%40name%3d'PMQ_WELL']%2ffolder[%40name%3d'INDICATOR']%2freport[%40name%3d'Indi_diagram1'])&ui.name=Indi_diagram2&ui.format=CSV&cv.toolbar=false&cv.header=false&p_pDiagram_ID=diag_id";  
+        		
+        		var cognos_diag_url_bk = "http://9.110.83.168/ibmcognos/cgi-bin/cognos.cgi?b_action=cognosViewer&ui.action=run&ui.object=%2fcontent%2fpackage[%40name%3d%27PMQXJ%27]%2ffolder[%40name%3d%27yulong%27]%2freport[%40name%3d%27shigongtu_test%27]&ui.name=shigongtu_test&run.outputFormat=&run.prompt=false&p_pDiagram_ID=diag_id&cv.toolbar=false&cv.header=false" 
+    			$("<span>").text($.cookie("userteam")).appendTo($("#container_title div[id='userteam']"));
+    			function sortDescend(menu_list){
+    				var reg = /[^0-9]/ig;
+    				var list = menu_list;
+    				for(var i=0; i<list.length; i++){
+		  				for(var j=list.length-1; j>i; j--){
+							if (parseInt(list[j].replace(reg,"")) > parseInt(list[j-1].replace(reg,""))) {
+								temp = list[j-1];
+			  					list[j-1] = list[j];
+			  					list[j] = temp;
+							}
+		  				}
+					}
+					return list;
+    			}
+    			
+    			function sortAscend(data_list, key){
+    				var reg = /[^0-9]/ig;
+    				for(var i=0;i<data_list.length;i++){
+    					for(var j=data_list.length-1;j>i;j--){
+    						if(parseInt(data_list[j][key].replace(reg,"")) < parseInt(data_list[j-1][key].replace(reg,""))){
+    							temp = data_list[j-1];
+    							data_list[j-1] = data_list[j];
+    							data_list[j] = temp;
+    						}
+    					}
+    				}
+    			}
+    			
+    			function getCheckDateList(well_name, data){
+    				var check_date_list = [];
+    				$.each(data, function(key, val){
+    					if(val.well_name == well_name){
+    						check_date_list = val.check_date;
+    						return false;
+    					}
+    				});
+    				return check_date_list;
+    			}
+    			    			
+    			$.ajax({
+    			  type: "post",
+                  url:  "GetWellInfo_do",
+                  data: {"userteam": $.cookie("userteam")},
+                  dataType: "json",
+                  beforeSend: function(){
+                      $("#open_btn").trigger("click");
+				  },
+                  success: function(data){
+                  		setTimeout(function(){
+                  			$("#close_btn").trigger("click");
+                  		}, 2000);
+                  		
+						if(data.length == 0){
+							setTimeout(function(){
+								alert("没有该采油队的井号或修井记录！");
+							},1000);
+							
+						}else{
+							$("#well_index").empty();
+							well_info = data;
+
+							$("#well_check_date").change(function(event){
+								event.preventBubble=true;
+		 						var well_name = $("#well_index").find("option:selected").text();
+		 						var check_date = $(this).find("option:selected").text();
+		 						var isOK = true;
+	
+		 						$.each(well_info, function(key, val){
+		 							if(val.well_name == well_name){
+		 								var index = $.inArray(check_date, val.check_date);
+		 								if(index == -1){
+		 									isOK = false;
+		 								}else{
+		 									$("#well_oper").text(val.well_oper[index]);
+		 									$("#well_content").text(val.well_content[index]);
+		 								}
+		 								
+		 							}
+		 						});
+		 						if(!isOK){
+		 							alert("数据库修井措施数据错误！");
+		 						}
+		 						
+	 						});
+							
+							$.each(well_info, function(key, val){
+								val.check_date = sortDescend(val.check_date);
+								var $opt = $("<option>").attr("value", (parseInt(key)+1).toString()).text(val.well_name); 
+								$("#well_index").append($opt);
+								well_index_list.push(val.well_name);
+								if(key == 0) {
+									initSelectMenu(val.check_date, "well_check_date");
+		 							$("#well_check_date").trigger("change");
+								}
+							});
+						}
+						
+						$("#well_index").change(function(){
+	 						var $active_opt = $("#well_index").find("option:selected");
+	 						initSelectMenu(getCheckDateList($active_opt.text(), well_info), "well_check_date");
+	 						/* $("#well_check_date option").eq(3).attr("selected",true); */
+	 						$("#well_check_date").trigger("change");
+	 					});
+	 					
+	 					$("#sum_diag_view").click(function(){
+	 						if(well_index_list.length>0)
+	 						{
+	 						    var sel_well_name = $("#well_index").find("option:selected").text();
+	 						    var sel_check_date = $("#well_check_date").find("option:selected").text();
+	 							initSelectMenu(well_index_list, "well_index_combo");
+	 							
+	 							$("#well_index_combo option").each(function(){
+	 								$(this).removeAttr("selected");
+	 								if($(this).text() == sel_well_name){
+	 									$(this).attr("selected",true);
+	 								}
+	 							});
+	 							$("#base_date").text(sel_check_date);
+	 						}
+	 					});
+	 					
+	 					
+                  }, 
+                  error: function(){
+                        setTimeout(function(){
+                        	alert("向数据库请求数据失败！");
+                        	$("#close_btn").trigger("click");
+                        }, 1000);
+                        window.open("homepage.html?user="+$.cookie("user"));
+                  }
+    			});
+    			
+    			$("#fix_date_btn").on('click', function(){
+    				var well_name = $("#well_index").find("option:selected").text();
+    				var well_date = $("#well_check_date").find("option:selected").text();
+    				$("#diag_container").empty();
+    				$.ajax({
+	   	    			  type: "post",
+	   	                  url:  "GetDiagID_do",
+	   	                  data: {"unioncode": $.cookie("unioncode"),"well_name":well_name,"well_date":well_date},
+	   	                  dataType: "json",
+	   	                  success: function(data){
+	   	                	if(data.length == 0){
+	   	                		alert("数据库没有找到该井号在这天的修井记录");								
+							}else{
+								sortAscend(data,"date");
+								$.each(data,function(key, data_val){
+									var $row = $("<div>").addClass("diag_row").addClass("col-md-12").appendTo("#diag_container");
+									var $date_div = $("<div>").addClass("date_div").addClass("col-md-2 col-lg-2").text(data_val.date).appendTo($row);
+									var $img_div = $("<div>").addClass("img_div").addClass("col-md-12").appendTo($row);
+									
+									for(var i=0;i<data_val.time.length;i++){
+										var cur_img_url = cognos_diag_url.replace(/diag_id/,data_val.diag_id[i]);
+										cur_img_url = cur_img_url.replace(/report_id/, (i+1).toString());
+
+										var $diag_div = $("<div class='diag_div'>").addClass("container col-md-3 col-lg-3").appendTo($img_div);
+							
+										var $warpper = $("<div>").addClass("diag_wrapper").appendTo($diag_div);
+										var $img_iframe = $("<iframe scrolling='no' src=\""+cur_img_url+"\">").appendTo($warpper);
+										var $radio_label = $("<label>").appendTo($diag_div);
+										var $radio_btn = $("<input type='radio' name='diag_radio'>").attr('value',data_val.diag_id[i]).appendTo($radio_label);
+										var $p = $("<p>").text(data_val.time[i]).appendTo($radio_label);
+									}
+								});
+								$("#submit_diag_base").show();
+								
+								$("#submit_diag_base").on("click", function(){
+									if($("input[name='diag_radio']:checked").length == 0)
+									{
+										alert("请选择一幅示功图作为基准！");
+										return false;
+									}
+									var sel_diagram_id = $("input[name='diag_radio']:checked").attr("value");
+									
+									
+									
+									var basedate = $("input[name='diag_radio']:checked").parents(".img_div").siblings(".date_div").text();
+									var basetime = $("input[name='diag_radio']:checked").siblings("p").text();
+
+									$.ajax({
+									    type: "post",
+				   	                    url:  "SetBaseDiag_do",
+				   	                    data: {"unioncode": $.cookie("unioncode"),"userteam":$.cookie("userteam"),
+				   	                    	   "diag_id":sel_diagram_id,"well_name":well_name,"basedate":basedate,"basetime":basetime},
+				   	                    dataType: "json",
+				   	                    success: function(flag){
+				   	                		if(flag == "true"){
+				   	                			alert("success");
+				   	                		}else{
+				   	                			alert("failure");
+				   	                		}
+				   	                    },
+				   	                    error: function(){
+				   	                	  
+				   	                    }
+									});
+								});
+								
+							}
+	   	                  },
+	   	                  error: function(){
+	   	                	  
+	   	                  }
+    				});	   	          
+    			});
+    			
+    		});
+    	</script>
+	</body>
+</html>

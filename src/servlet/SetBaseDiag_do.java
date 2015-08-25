@@ -10,15 +10,13 @@ import javax.servlet.http.HttpServletResponse;
 
 import dao.DAO;
 import net.sf.json.JSONException;
-import net.sf.json.JSONObject;
-import t_user.T_User;
 
-public class Login_do extends HttpServlet {
+public class SetBaseDiag_do extends HttpServlet {
 	private static final long serialVersionUID = 1L;  
 	/**
 	 * Constructor of the object.
 	 */
-	public Login_do() {
+	public SetBaseDiag_do() {
 		super();
 	}
 
@@ -58,39 +56,30 @@ public class Login_do extends HttpServlet {
 	public void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		// TODO Auto-generated method stub
-		String name=request.getParameter("username");
-		String pwd=request.getParameter("password");
 		request.setCharacterEncoding("utf-8"); 
 		response.setCharacterEncoding("utf-8");
 		response.setContentType("text/html; charset=utf-8");
+		final String unioncode = request.getParameter("unioncode");
+		final String well_name = request.getParameter("well_name");
+		final String userteam = request.getParameter("userteam");
+		final String diag_id = request.getParameter("diag_id");
+		final String basedate = request.getParameter("basedate");
+		final String basetime = request.getParameter("basetime");
 		
-		DAO t_user_query = new DAO();
-		try{
-			String check_status = t_user_query.verifyUser(name, pwd) ? "true" : "false";
-			try{
-				T_User user = t_user_query.queryUserInfo(name);
-				JSONObject jsonObj = new JSONObject();
-				try {
-					jsonObj.put("msg", check_status); 
-					jsonObj.put("userteam", user.getUserTeam());
-					jsonObj.put("usertype", user.getUserType());
-					jsonObj.put("unioncode", user.getUnionCode());
-					
-					PrintWriter out = response.getWriter();
-					out.write(jsonObj.toString());
-					out.flush();
-					out.close();
-					out = null;
-				} catch (JSONException e) {
-					e.printStackTrace();
-				}
-			}catch(Exception e){
-				e.printStackTrace();
-			}
-		}catch(Exception e){
+		final String date_time = basedate+" "+basetime;
+
+		DAO t_dao = new DAO();
+		boolean isOKSetBaseDiag = t_dao.setBaseDiagID(unioncode, userteam, well_name, diag_id, date_time);
+		
+		try {
+			PrintWriter out = response.getWriter();
+			out.write(String.valueOf(isOKSetBaseDiag));
+			out.flush();
+			out.close();
+			out = null;
+		} catch (JSONException e) {
 			e.printStackTrace();
 		}
-		
 	}
 
 	/**
@@ -103,3 +92,4 @@ public class Login_do extends HttpServlet {
 	}
 
 }
+

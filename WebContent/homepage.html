@@ -1,0 +1,128 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>    
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta http-equiv="description" content="Predictive Maintenance and Quality">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" href="css/bootstrap.min.css">
+	<link rel="stylesheet" href="css/style.css">
+  </head>
+  
+  <body>
+  	<center>
+  		<div class="container jumbotron_head">
+	  		<div class="jumbotron">
+				<div class="container">
+					<h2>IBM Predictive Maintenance and Quality</h2>
+				</div>
+			</div>
+		</div>
+		<div class="container jumbotron_foot col-md-4">
+			<ul id="homepage_sub_banner">
+				<li>
+					<p id="user_info"></p>
+				</li>	
+				<li>
+					<a id="quit_href" href="#">关于PMQ</a>
+				</li>
+				<li>
+					<a id="quit_href" href="index.html">注销登录</a>
+				</li>		
+			</ul>
+		</div>
+	  	<div class="container" id="main_field">
+	  		<div class="row">
+	  			<div class="user_view">
+			  		<div class="card user_view" id="general_div">
+			  			<div class="card_top">
+							<span>总体概览</span>
+						</div>
+						<div class="card_content">
+							<h5>显示抽油井的综合状况</h5>
+						</div>
+					</div>
+				</div>
+				<div class="user_view">
+		  			<div class="card user_view" id="prediction_div">
+		  				<div class="card_top">
+							<span>结蜡预测</span>
+						</div>
+						<div class="card_content">
+							<h5>预测抽油井的结蜡时间和状况</h5>
+						</div>
+		  			</div>
+	  			</div>
+	  			<div class="user_view">
+			  		<div class="card" id="diagnose_div">
+			  			<div class="card_top">
+							<span>功图诊断</span>
+						</div>
+						<div class="card_content">
+							<h5>并查看示工图叠加的状态</h5>
+						</div>
+			  		</div>
+			  	</div>
+			  	<div class="admin_view">
+			  		<div class="card" id="basediag_div">
+			  			<div class="card_top">
+							<span>选择基准示功图</span>
+						</div>
+						<div class="card_content">
+							<h5>设定基准示工图</h5>
+						</div>
+			  		</div>
+			  	</div>
+			  	<div class="admin_view">
+		  			<div class="card " id="dataupdate_div">
+		  				<div class="card_top">
+							<span>数据更新</span>
+						</div>
+						<div class="card_content">
+							<h5>更新抽油井相关操作的时间</h5>
+						</div>
+		  			</div>
+		  		</div>
+	  		</div>
+	  	</div>
+    </center> 
+    <script type="text/javascript" src="./js/jquery.js"></script>
+  	<script type="text/javascript" src="./js/jquery.cookie.js"></script>
+  	<script type="text/javascript" src="./js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="./js/method.js"></script>
+    <script type="text/javascript">
+    	$(document).ready(function(){	
+    		$.fn.removeBoostrapClass = function(){
+    			var reg = /(col-[a-z]{2}-[0-9]{1,2})/g;
+				var arr = reg.exec($(".row > div").attr("class"))
+				for(var index in arr){
+					$(".row > div").removeClass(arr[index]);
+				}
+				return $(".row > div");
+    		}
+    	
+    			
+			var username = /* getParameterByName("user"); */$.cookie("user");
+			document.getElementById("user_info").innerHTML = "Hi! "+ username;
+			$.cookie("nav_link", "navigator.html");
+			
+			if($.cookie("usertype") == "Admin"){
+				//for admin, general and prediction interface is concealed
+				$(".user_view").hide();
+				$(".admin_view").show();
+				$(".row > div").removeBoostrapClass().addClass("col-md-6").addClass("col-lg-6");
+			}else{
+				//for user, data-update interface is concealed
+				$(".admin_view").hide();
+				$(".user_view").show();
+				$(".row > div").removeBoostrapClass().addClass("col-md-4").addClass("col-lg-4");
+			}
+			
+			$(".card").click(function(e){
+				var view = $(this).attr("id").split("_")[0];
+				$.cookie("view", view);
+				window.open($.cookie("nav_link"), "_self"); 
+			});
+		});
+    </script>
+  </body>
+</html>
