@@ -5,20 +5,18 @@ import java.io.PrintWriter;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
-/*import javax.servlet.http.HttpSession;*/
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import dao.DAO;
 import net.sf.json.JSONException;
-import net.sf.json.JSONArray;
 
-public class GetWellInfo_do extends HttpServlet {
+public class SetBaseDiag_do extends HttpServlet {
 	private static final long serialVersionUID = 1L;  
 	/**
 	 * Constructor of the object.
 	 */
-	public GetWellInfo_do() {
+	public SetBaseDiag_do() {
 		super();
 	}
 
@@ -61,14 +59,20 @@ public class GetWellInfo_do extends HttpServlet {
 		request.setCharacterEncoding("utf-8"); 
 		response.setCharacterEncoding("utf-8");
 		response.setContentType("text/html; charset=utf-8");
+		final String unioncode = request.getParameter("unioncode");
+		final String well_name = request.getParameter("well_name");
 		final String userteam = request.getParameter("userteam");
+		final String diag_id = request.getParameter("diag_id");
+		final String basedate = request.getParameter("basedate");
+		final String basetime = request.getParameter("basetime");
+		
+		final String date_time = basedate+" "+basetime;
 
 		DAO t_dao = new DAO();
-		JSONArray well_fix_date_list = t_dao.getWellFixDateList(userteam);
-
+		boolean isOKSetBaseDiag = t_dao.setBaseDiagID(unioncode, userteam, well_name, diag_id, date_time);
 		try {
 			PrintWriter out = response.getWriter();
-			out.write(well_fix_date_list.toString());
+			out.write(String.valueOf(isOKSetBaseDiag));
 			out.flush();
 			out.close();
 			out = null;
@@ -87,3 +91,4 @@ public class GetWellInfo_do extends HttpServlet {
 	}
 
 }
+

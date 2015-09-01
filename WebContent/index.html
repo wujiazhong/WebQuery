@@ -8,65 +8,71 @@
 		<link rel="stylesheet" href="css/style.css">
 	</head>
 	<body>
+		<center>
 		<a class="open_btn" id="forget_pwd_btn" data-reveal-id="forget_pwd_modal" style="display:none"></a>
 		<div id="forget_pwd_modal" class="reveal-modal">
 	  		<h2>请联系管理员修改密码！</h2>
 			<a class="close_btn close-reveal-modal">&times;</a>
 		</div>	
-		<div class="jumbotron">
+		<div id="banner">
 			<div class="container">
 				<h1>Predictive and Maintenance Quality </h1>
-				<h3>&nbsp;&nbsp;&nbsp;&nbsp;---&nbsp;IBM抽油井数据分析平台</h3>
 			</div>
 		</div>
-		<div class="container" style="text-align:center">
+		<div id="login_box" style="text-align:center">
+			<h3>抽油井大数据分析平台</h3>
+			<br>
 			<form class="form-horizontal" role="form" onsubmit="return false" id="login_form">
 			   <div class="form-group">
-				  <label for="username" class="col-lg-2 col-md-2 col-lg-offset-3 col-md-offset-4 control-label">Username: </label>
-				  <div class="col-lg-2 col-md-2">
+				  <label for="username" class="col-lg-4 col-md-4 col-lg-offset-1 col-md-offset-1 control-label">用户名: </label>
+				  <div class="col-lg-5 col-md-5">
 					 <input type="text" class="form-control" id="username" placeholder="username">
 				  </div>
 			   </div>
 			   <div class="form-group">
-				  <label for="lastname" class="col-lg-2 col-md-2 col-lg-offset-3 col-md-offset-4 control-label">Password: </label>
-				  <div class="col-lg-2 col-md-2">
+				  <label for="lastname" class="col-lg-4 col-md-4 col-lg-offset-1 col-md-offset-1 control-label">密 &nbsp;&nbsp;&nbsp;码: </label>
+				  <div class="col-lg-5 col-md-5">
 					 <input type="password" class="form-control" id="inputPassword" placeholder="password">
 				  </div>
 			   </div>
 			   <div class="container col-lg-12 col-md-12" >
-			   		<div id="warning_box"  class="col-lg-3 col-md-3 col-lg-offset-4 col-md-offset-5">
+			   		<div id="warning_box"  class="col-lg-6 col-md-6 col-lg-offset-3 col-md-offset-3">
 			   			
 			   		</div>
 			   </div>		
 			   <div class="form-group">
-				  <div class="col-md-offset-4 col-md-4">
-					<label><a href="#" id="forget_pwd">忘记密码&nbsp;&nbsp;</label>
-					<label><a href="#">&nbsp;&nbsp;注册用户</label>
+				  <div class="col-md-offset-2 col-md-8">
+					<label><a href="#" id="forget_pwd">忘记密码&nbsp;&nbsp;</a></label>
+					<label><a href="#">&nbsp;&nbsp;注册用户</a></label>
 				  </div>
 			   </div>
 			   <div class="form-group">
-				  <div class="col-md-offset-5 col-md-2">
-					 <button id="login_btn" class="btn btn-default">登录</button>
+				  <div class="col-md-offset-4 col-md-8">
+					 <button id="login_btn" class="btn btn-default col-md-6">登录</button>
 				  </div>
 			   </div>
 			</form>
+			
 			<a class="open_btn" id="conn_fail_btn" data-reveal-id="conn_fail_modal" style="display:none"></a>
 		  	<div id="conn_fail_modal" class="reveal-modal">
 		  		<h2>向数据库请求数据失败，请检查数据库连接状况！</h2>
 				<a class="close_btn close-reveal-modal">&times;</a>
 		  	</div>	
 		</div>
+		<div id="footer">
+			<img id="img_card" src="img/pm_home_bg.png"/>
+		</div>
+
+		</center>
 		<script type="text/javascript" src="js/jquery.js"></script>
 		<script type="text/javascript" src="js/bootstrap.min.js"></script>
 		<script type="text/javascript" src="js/jquery.cookie.js"></script>
 		<script type="text/javascript" src="js/jquery.reveal.js"></script>
     	<script type="text/javascript" src="js/method.js"></script>
     	<script type="text/javascript">
-	    	$(document).ready(function(){ 
-	    		$("#warning_box").hide();  
-	    			
+	    	$(document).ready(function(){ 	    		
+	    		$("#warning_box").hide();  	    			
 	   			$("#login_btn").on("click", function(event){
-	   				console.log("in click");
 	   				event.preventDefault();
 	    			var username = $("#username").val();
 	    			var password = $("#inputPassword").val();
@@ -74,7 +80,7 @@
 	    				$("#warning_box").text("用户名或密码不能为空！").show();
 	    				return false;
 	    			}
-	
+
 	    			$.ajax({
 	                  type: "post",
 	                  url:  "Login_do",
@@ -84,7 +90,16 @@
 							if(data.msg == "true"){
 								$.cookie("user",username);
 								$.cookie("userteam",data.userteam);
-								window.open("homepage.html?user="+username, "_self");
+								$.cookie("usertype",data.usertype);
+								$.cookie("unioncode",data.unioncode);
+								
+								/*for no homepage*/
+								if (data.usertype == "Admin"){
+									$.cookie("view","basediag");//default view for admin； basediag
+								}else if (data.usertype == "User"){
+									$.cookie("view","general");//default view for admin； general
+								}
+								window.open("navigator.html", "_self");
 							}else{
 								$("#warning_box").text("用户名或密码错误！").show();
 							}

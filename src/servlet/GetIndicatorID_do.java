@@ -13,12 +13,12 @@ import dao.DAO;
 import net.sf.json.JSONException;
 import net.sf.json.JSONArray;
 
-public class GetWellInfo_do extends HttpServlet {
+public class GetIndicatorID_do extends HttpServlet {
 	private static final long serialVersionUID = 1L;  
 	/**
 	 * Constructor of the object.
 	 */
-	public GetWellInfo_do() {
+	public GetIndicatorID_do() {
 		super();
 	}
 
@@ -65,7 +65,7 @@ public class GetWellInfo_do extends HttpServlet {
 
 		DAO t_dao = new DAO();
 		JSONArray well_fix_date_list = t_dao.getWellFixDateList(userteam);
-
+		
 		try {
 			PrintWriter out = response.getWriter();
 			out.write(well_fix_date_list.toString());

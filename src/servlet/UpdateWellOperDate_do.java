@@ -2,23 +2,20 @@ package servlet;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
-/*import javax.servlet.http.HttpSession;*/
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import dao.DAO;
 import net.sf.json.JSONException;
-import net.sf.json.JSONArray;
 
-public class GetWellInfo_do extends HttpServlet {
+public class UpdateWellOperDate_do extends HttpServlet {
 	private static final long serialVersionUID = 1L;  
 	/**
 	 * Constructor of the object.
 	 */
-	public GetWellInfo_do() {
+	public UpdateWellOperDate_do() {
 		super();
 	}
 
@@ -61,14 +58,24 @@ public class GetWellInfo_do extends HttpServlet {
 		request.setCharacterEncoding("utf-8"); 
 		response.setCharacterEncoding("utf-8");
 		response.setContentType("text/html; charset=utf-8");
+		final String unioncode = request.getParameter("unioncode");
 		final String userteam = request.getParameter("userteam");
+		final String json_str = request.getParameter("json_str");
+		final String oper = request.getParameter("oper");
+		System.out.println("userteam:"+userteam);
+/*		BufferedReader in = new BufferedReader(new InputStreamReader(request.getInputStream()));
+		StringBuilder sb = new StringBuilder();   
+		String line = null;  
+		while ((line = in.readLine()) != null) {   
+			sb.append(line);   
+		} */ 
 
 		DAO t_dao = new DAO();
-		JSONArray well_fix_date_list = t_dao.getWellFixDateList(userteam);
-
+		boolean isSuccess = t_dao.UpdateOperationDate(oper,json_str,userteam,unioncode);
+		
 		try {
 			PrintWriter out = response.getWriter();
-			out.write(well_fix_date_list.toString());
+			out.write(String.valueOf(isSuccess));
 			out.flush();
 			out.close();
 			out = null;
@@ -87,3 +94,4 @@ public class GetWellInfo_do extends HttpServlet {
 	}
 
 }
+

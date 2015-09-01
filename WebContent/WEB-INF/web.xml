@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://java.sun.com/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+         id="WebApp_ID" version="2.5">
+  <display-name>WebQuery</display-name>
+  <welcome-file-list>
+    <welcome-file>index.html</welcome-file>
+  </welcome-file-list>
+  <servlet>
+    <description>Check whether it is a registered user.</description>
+    <display-name>Login_do</display-name>
+    <servlet-name>Login_do</servlet-name>
+    <servlet-class>servlet.Login_do</servlet-class>
+  </servlet>
+  <servlet>
+    <description>Get well basic information from database.</description>
+    <display-name>GetWellInfo_do</display-name>
+    <servlet-name>GetWellInfo_do</servlet-name>
+    <servlet-class>servlet.GetWellInfo_do</servlet-class>
+  </servlet>
+  <servlet>
+    <description>Get well washing and fixing date from datatbase.</description>
+    <display-name>GetWellOperDate_do</display-name>
+    <servlet-name>GetWellOperDate_do</servlet-name>
+    <servlet-class>servlet.GetWellOperDate_do</servlet-class>
+  </servlet>
+  <servlet>
+    <description>Get diagram ID information for well.</description>
+    <display-name>GetDiagID_do</display-name>
+    <servlet-name>GetDiagID_do</servlet-name>
+    <servlet-class>servlet.GetDiagID_do</servlet-class>
+  </servlet>
+  <servlet>
+    <description>Set base diagram ID for well.</description>
+    <display-name>SetBaseDiag_do</display-name>
+    <servlet-name>SetBaseDiag_do</servlet-name>
+    <servlet-class>servlet.SetBaseDiag_do</servlet-class>
+  </servlet>
+  <servlet>
+    <description>Update operation date for well.</description>
+    <display-name>UpdateWellOperDate_do</display-name>
+    <servlet-name>UpdateWellOperDate_do</servlet-name>
+    <servlet-class>servlet.UpdateWellOperDate_do</servlet-class>
+  </servlet>
+  <servlet>
+  	<description>Initialize log4J.</description>
+  	<servlet-name>Log4JInitServlet</servlet-name>
+  	<servlet-class>servlet.Log4JInitServlet</servlet-class>
+  	<init-param>
+  		<param-name>log4j-properties-location</param-name>
+  		<param-value>/WEB-INF/classes/log4j.properties</param-value>
+  	</init-param>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>Login_do</servlet-name>
+    <url-pattern>/Login_do</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>GetWellInfo_do</servlet-name>
+    <url-pattern>/GetWellInfo_do</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>GetWellOperDate_do</servlet-name>
+    <url-pattern>/GetWellOperDate_do</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>GetDiagID_do</servlet-name>
+    <url-pattern>/GetDiagID_do</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>SetBaseDiag_do</servlet-name>
+    <url-pattern>/SetBaseDiag_do</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>UpdateWellOperDate_do</servlet-name>
+    <url-pattern>/UpdateWellOperDate_do</url-pattern>
+  </servlet-mapping>
+</web-app>

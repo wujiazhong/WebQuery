@@ -5,7 +5,6 @@ import java.io.PrintWriter;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
-/*import javax.servlet.http.HttpSession;*/
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -13,12 +12,12 @@ import dao.DAO;
 import net.sf.json.JSONException;
 import net.sf.json.JSONArray;
 
-public class GetWellInfo_do extends HttpServlet {
+public class GetDiagID_do extends HttpServlet {
 	private static final long serialVersionUID = 1L;  
 	/**
 	 * Constructor of the object.
 	 */
-	public GetWellInfo_do() {
+	public GetDiagID_do() {
 		super();
 	}
 
@@ -61,14 +60,16 @@ public class GetWellInfo_do extends HttpServlet {
 		request.setCharacterEncoding("utf-8"); 
 		response.setCharacterEncoding("utf-8");
 		response.setContentType("text/html; charset=utf-8");
-		final String userteam = request.getParameter("userteam");
+		final String unioncode = request.getParameter("unioncode");
+		final String well_name = request.getParameter("well_name");
+		final String well_date = request.getParameter("well_date");
 
 		DAO t_dao = new DAO();
-		JSONArray well_fix_date_list = t_dao.getWellFixDateList(userteam);
-
+		JSONArray diag_id_list = t_dao.getDiagID(unioncode, well_date, well_name);
+		
 		try {
 			PrintWriter out = response.getWriter();
-			out.write(well_fix_date_list.toString());
+			out.write(diag_id_list.toString());
 			out.flush();
 			out.close();
 			out = null;
@@ -87,3 +88,4 @@ public class GetWellInfo_do extends HttpServlet {
 	}
 
 }
+

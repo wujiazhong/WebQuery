@@ -5,20 +5,20 @@ import java.io.PrintWriter;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import dao.DAO;
 import net.sf.json.JSONException;
-import net.sf.json.JSONObject;
+/*import net.sf.json.JSONObject;*/
 import net.sf.json.JSONArray;
 
-public class GetWellOperation_do extends HttpServlet {
+public class GetWellOperDate_do extends HttpServlet {
 	private static final long serialVersionUID = 1L;  
 	/**
 	 * Constructor of the object.
 	 */
-	public GetWellOperation_do() {
+	public GetWellOperDate_do() {
 		super();
 	}
 
@@ -58,35 +58,17 @@ public class GetWellOperation_do extends HttpServlet {
 	public void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		// TODO Auto-generated method stub
-		final String well_name = "well_name";
-		final String check_date = "check_date";
 		request.setCharacterEncoding("utf-8"); 
 		response.setCharacterEncoding("utf-8");
 		response.setContentType("text/html; charset=utf-8");
+		final String userteam = request.getParameter("userteam");
+
+		DAO t_dao = new DAO();
+		JSONArray oper_date = t_dao.getOperDateList(userteam);
 		
-		HttpSession hs = request.getSession(true);  
-		JSONArray jsonArray = (JSONArray)hs.getAttribute("well_operation");
-		System.out.println("operation array size: "+jsonArray.size());
-		
-		JSONObject jsonOperObj = new JSONObject();
-		JSONArray jsonOperArray = new JSONArray();
 		try {
-			try{
-				for(int i=0;i<jsonArray.size();i++){
-					JSONObject json_item = (JSONObject)jsonArray.get(i);
-					if(well_name.equals(json_item.getString("well_name")) && check_date.equals(json_item.getString("check_date"))){
-						jsonOperObj.clear();
-						jsonOperObj.put("well_operation", json_item.getString("well_operation"));
-						jsonOperObj.put("operation_content", json_item.getString("operation_content"));
-						jsonOperArray.add(jsonOperObj);
-						break;
-					}
-				}
-			}catch(JSONException e){
-				e.printStackTrace();
-			}
 			PrintWriter out = response.getWriter();
-			out.write(jsonOperArray.toString());
+			out.write(oper_date.toString());
 			out.flush();
 			out.close();
 			out = null;

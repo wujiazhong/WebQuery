@@ -12,9 +12,11 @@ import dao.DAO;
 import net.sf.json.JSONException;
 import net.sf.json.JSONObject;
 import t_user.T_User;
+import org.apache.log4j.Logger;
 
 public class Login_do extends HttpServlet {
 	private static final long serialVersionUID = 1L;  
+	private static Logger logger = Logger.getLogger(Login_do.class);
 	/**
 	 * Constructor of the object.
 	 */
@@ -64,31 +66,51 @@ public class Login_do extends HttpServlet {
 		response.setCharacterEncoding("utf-8");
 		response.setContentType("text/html; charset=utf-8");
 		
+		logger.debug("enter login_do action...");
 		DAO t_user_query = new DAO();
 		try{
-			String check_status = t_user_query.verifyUser(name, pwd) ? "true" : "false";
-			try{
-				T_User user = t_user_query.queryUserInfo(name);
-				JSONObject jsonObj = new JSONObject();
-				try {
-					jsonObj.put("msg", check_status); 
-					jsonObj.put("userteam", user.getUserTeam());
+			logger.debug("before verifyUser...");
+			boolean check_status = t_user_query.verifyUser(name, pwd) ? true : false;
+			JSONObject jsonObj = new JSONObject();
+			if(check_status){
+				try{
+					logger.debug("before queryUserInfo...");
+					T_User user = t_user_query.queryUserInfo(name);
+					logger.debug("after queryUserInfo");
 					
-					PrintWriter out = response.getWriter();
-					out.write(jsonObj.toString());
-					out.flush();
-					out.close();
-					out = null;
-				} catch (JSONException e) {
+					try {
+						jsonObj.put("msg", String.valueOf(check_status)); 
+						jsonObj.put("userteam", user.getUserTeam());
+						jsonObj.put("usertype", user.getUserType());
+						jsonObj.put("unioncode", user.getUnionCode());
+						
+						PrintWriter out = response.getWriter();
+						out.write(jsonObj.toString());
+						out.flush();
+						out.close();
+						out = null;
+					} catch (JSONException e) {
+						logger.error("fail to get information from database!");
+						e.printStackTrace();
+					}
+				}catch(Exception e){
+					logger.error("fail to queryUserInfo from database!");
 					e.printStackTrace();
 				}
-			}catch(Exception e){
-				e.printStackTrace();
-			}
-		}catch(Exception e){
+			}else{
+				logger.debug("no such user...");
+				jsonObj.put("msg", String.valueOf(check_status)); 
+				
+				PrintWriter out = response.getWriter();
+				out.write(jsonObj.toString());
+				out.flush();
+				out.close();
+				out = null;
+			} 
+		}catch (JSONException e) {
+			logger.error("fail to get information from database!");
 			e.printStackTrace();
-		}
-		
+		}		
 	}
 
 	/**

@@ -6,33 +6,36 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link rel="stylesheet" href="css/bootstrap.min.css">
 	<link rel="stylesheet" href="css/jquery.multiselect2side.css" >
+	<link rel="stylesheet" type="text/css" href="./datatable/css/jquery.dataTables.css">
 	<link rel="stylesheet" href="css/style.css">
 	
   </head>
   <body>			
 	<header>
 		<div class="navbar navbar-default" role="navigation" style="padding: 0 10px;margin: 0 0;">
-		   <div class="navbar-header">
+<!-- 		   <div class="navbar-header">
 			  <p class="navbar-text"><a href="homepage.html">首页</a></p>
 			  <p class="navbar-text"><a href="index.html">注销登录</a></p>
-		   </div>
-		   <div class="navbar-header navbar-right">
+		   </div> -->
+		   <div class="navbar-header">
 			  <p class="navbar-text" id="username">用户名：</p>
 			  <p class="navbar-text" id="userteam">所属采油队：</p>
+			  <p class="navbar-text"><a href="index.html">注销登录</a></p>
 		   </div>
 		</div>
 	</header>
   	<center>
-		<nav class="navbar navbar-inverse" role="navigation">
+		<div class="navbar navbar-inverse" role="navigation">
 		   <div>
 		      <ul class="nav navbar-nav">
 		         <li class="tab_link" id="general"><a href="#">总体概览</a></li>
 		         <li class="tab_link" id="prediction"><a href="#">分析预测</a></li>
 		         <li class="tab_link" id="diagnose"><a href="#">功图诊断</a></li>
+		         <li class="tab_link" id="basediag"><a href="#">选择基准示功图</a></li>
 		         <li class="tab_link" id="dataupdate"><a href="#">数据更新</a></li>
 		      </ul>
 		   </div>
-		</nav>
+		</div>
   	  <div id="nav_main_field">
   	  	<!-- cognos report -->
   	  </div>
@@ -45,9 +48,22 @@
     	$(document).ready(function(){			
 			document.getElementById("username").innerHTML = "用户名: "+ $.cookie("user");
 			document.getElementById("userteam").innerHTML = "所属采油队: "+ $.cookie("userteam");
+			var usertype = $.cookie("usertype");
+			$.cookie("nav_link", "navigator.html");
 			var nav_link = $.cookie("nav_link");
+			var view_name = $.cookie("view");
+
+			if(usertype == "User"){
+				$(".tab_link").show();
+				$("#dataupdate").hide();
+				$("#basediag").hide();
+			}else if(usertype == "Admin"){
+				$(".tab_link").show();
+				$("#general").hide();
+				$("#prediction").hide();
+				$("#diagnose").hide();
+			}
 			
-			var view_name = getParameterByName("view");
 			$.each($("li"), function(key, val){
 				if( view_name == $(this).attr("id"))
 				{
@@ -57,13 +73,14 @@
 				}
 			});
 			
-			var backhome_action = "window.open('homepage.html?user="+$.cookie("user")+"')";
-			$("#ret_btn").attr("onclick", backhome_action);
+/* 			var backhome_action = "window.open('homepage.html?user="+$.cookie("user")+"')"; 
+			$("#ret_btn").attr("onclick", backhome_action); */
 
 			//bubble up the hyperlink to all the div
 			$(".inactive").click(function(e){
 				var view_name = $(this).attr("id");
-				window.open(nav_link + "&view="+view_name, "_self");
+				$.cookie("view", view_name);
+				window.open(nav_link, "_self");
 				e.stopPropagation();
 				
 			});
