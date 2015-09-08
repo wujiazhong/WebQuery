@@ -8,6 +8,7 @@ public class T_User {
 	private String name;
 	private String gender;
 	private String unioncode;
+	private String userteam_name;
 	
 	public T_User(final String user){		
 		setUserName(username);
@@ -59,6 +60,13 @@ public class T_User {
 	}
 	public void setGender(final String gender){
 		this.gender = gender;
+	}
+	
+	public String getUserteamName(){
+		return this.userteam_name;
+	}
+	public void setUserteamName(final String userteam_name){
+		this.userteam_name = userteam_name;
 	}
 
 }

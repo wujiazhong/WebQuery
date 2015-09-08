@@ -3,16 +3,19 @@ package servlet;
 import java.io.IOException;
 import java.io.PrintWriter;
 
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import dao.DAO;
+import db_conn_properties.DB_Conn_Properties;
 import net.sf.json.JSONException;
 
 public class SetBaseDiag_do extends HttpServlet {
 	private static final long serialVersionUID = 1L;  
+	private DB_Conn_Properties db_conn = null;
 	/**
 	 * Constructor of the object.
 	 */
@@ -68,7 +71,7 @@ public class SetBaseDiag_do extends HttpServlet {
 		
 		final String date_time = basedate+" "+basetime;
 
-		DAO t_dao = new DAO();
+		DAO t_dao = new DAO(db_conn);
 		boolean isOKSetBaseDiag = t_dao.setBaseDiagID(unioncode, userteam, well_name, diag_id, date_time);
 		try {
 			PrintWriter out = response.getWriter();
@@ -86,8 +89,16 @@ public class SetBaseDiag_do extends HttpServlet {
 	 *
 	 * @throws ServletException if an error occurs
 	 */
-	public void init() throws ServletException {
+	public void init(ServletConfig config) throws ServletException {
 		// Put your code here
+		String db_properties_location = config.getInitParameter("db_conn_properties_location"); 
+		db_properties_location = Login_do.class.getResource("/"+db_properties_location).toString(); 
+		
+		//leave out "file:" in location string
+		db_properties_location = db_properties_location.substring(5);
+
+		System.out.println(db_properties_location);
+		db_conn = new DB_Conn_Properties(db_properties_location);
 	}
 
 }

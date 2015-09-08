@@ -3,6 +3,7 @@ package servlet;
 import java.io.IOException;
 import java.io.PrintWriter;
 
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 /*import javax.servlet.http.HttpSession;*/
@@ -10,11 +11,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import dao.DAO;
+import db_conn_properties.DB_Conn_Properties;
 import net.sf.json.JSONException;
 import net.sf.json.JSONArray;
 
 public class GetWellInfo_do extends HttpServlet {
-	private static final long serialVersionUID = 1L;  
+	private static final long serialVersionUID = 1L; 
+	private DB_Conn_Properties db_conn = null;
 	/**
 	 * Constructor of the object.
 	 */
@@ -63,7 +66,7 @@ public class GetWellInfo_do extends HttpServlet {
 		response.setContentType("text/html; charset=utf-8");
 		final String userteam = request.getParameter("userteam");
 
-		DAO t_dao = new DAO();
+		DAO t_dao = new DAO(db_conn);
 		JSONArray well_fix_date_list = t_dao.getWellFixDateList(userteam);
 
 		try {
@@ -82,8 +85,16 @@ public class GetWellInfo_do extends HttpServlet {
 	 *
 	 * @throws ServletException if an error occurs
 	 */
-	public void init() throws ServletException {
+	public void init(ServletConfig config) throws ServletException {
 		// Put your code here
+		String db_properties_location = config.getInitParameter("db_conn_properties_location"); 
+		db_properties_location = Login_do.class.getResource("/"+db_properties_location).toString(); 
+		
+		//leave out "file:" in location string
+		db_properties_location = db_properties_location.substring(5);
+
+		System.out.println(db_properties_location);
+		db_conn = new DB_Conn_Properties(db_properties_location);
 	}
 
 }

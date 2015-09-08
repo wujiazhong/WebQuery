@@ -12,36 +12,80 @@
     <display-name>Login_do</display-name>
     <servlet-name>Login_do</servlet-name>
     <servlet-class>servlet.Login_do</servlet-class>
+	<init-param>
+  		<param-name>db_conn_properties_location</param-name>
+  		<param-value>db_conn.properties</param-value>
+  	</init-param>
   </servlet>
   <servlet>
     <description>Get well basic information from database.</description>
     <display-name>GetWellInfo_do</display-name>
     <servlet-name>GetWellInfo_do</servlet-name>
     <servlet-class>servlet.GetWellInfo_do</servlet-class>
+	<init-param>
+  		<param-name>db_conn_properties_location</param-name>
+  		<param-value>db_conn.properties</param-value>
+  	</init-param>
   </servlet>
   <servlet>
     <description>Get well washing and fixing date from datatbase.</description>
     <display-name>GetWellOperDate_do</display-name>
     <servlet-name>GetWellOperDate_do</servlet-name>
     <servlet-class>servlet.GetWellOperDate_do</servlet-class>
+	<init-param>
+  		<param-name>db_conn_properties_location</param-name>
+  		<param-value>db_conn.properties</param-value>
+  	</init-param>
   </servlet>
   <servlet>
     <description>Get diagram ID information for well.</description>
     <display-name>GetDiagID_do</display-name>
     <servlet-name>GetDiagID_do</servlet-name>
     <servlet-class>servlet.GetDiagID_do</servlet-class>
+	<init-param>
+  		<param-name>db_conn_properties_location</param-name>
+  		<param-value>db_conn.properties</param-value>
+  	</init-param>
   </servlet>
   <servlet>
     <description>Set base diagram ID for well.</description>
     <display-name>SetBaseDiag_do</display-name>
     <servlet-name>SetBaseDiag_do</servlet-name>
     <servlet-class>servlet.SetBaseDiag_do</servlet-class>
+	<init-param>
+  		<param-name>db_conn_properties_location</param-name>
+  		<param-value>db_conn.properties</param-value>
+  	</init-param>
   </servlet>
   <servlet>
     <description>Update operation date for well.</description>
     <display-name>UpdateWellOperDate_do</display-name>
     <servlet-name>UpdateWellOperDate_do</servlet-name>
     <servlet-class>servlet.UpdateWellOperDate_do</servlet-class>
+	<init-param>
+  		<param-name>db_conn_properties_location</param-name>
+  		<param-value>db_conn.properties</param-value>
+  	</init-param>
+  </servlet>
+  <servlet>
+    <description>Get cognos report id for overview.</description>
+    <display-name>GetCognosReportID_do</display-name>
+    <servlet-name>GetCognosReportID_do</servlet-name>
+    <servlet-class>servlet.GetCognosReportID_do</servlet-class>
+	<init-param>
+  		<param-name>db_conn_properties_location</param-name>
+  		<param-value>db_conn.properties</param-value>
+  	</init-param>
+  </servlet>
+  <servlet>
+    <description>Get well name list for the userteam.</description>
+    <display-name>GetWellName_do</display-name>
+    <servlet-name>GetWellName_do</servlet-name>
+    <servlet-class>servlet.GetWellName_do</servlet-class>
+	<init-param>
+  		<param-name>db_conn_properties_location</param-name>
+  		<param-value>db_conn.properties</param-value>
+  	</init-param>
   </servlet>
   <servlet>
   	<description>Initialize log4J.</description>
@@ -49,9 +93,10 @@
   	<servlet-class>servlet.Log4JInitServlet</servlet-class>
   	<init-param>
   		<param-name>log4j-properties-location</param-name>
-  		<param-value>/WEB-INF/classes/log4j.properties</param-value>
+  		<param-value>log4j.properties</param-value>
   	</init-param>
   </servlet>
+  
 
   <servlet-mapping>
     <servlet-name>Login_do</servlet-name>
@@ -76,5 +121,13 @@
   <servlet-mapping>
     <servlet-name>UpdateWellOperDate_do</servlet-name>
     <url-pattern>/UpdateWellOperDate_do</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>GetCognosReportID_do</servlet-name>
+    <url-pattern>/GetCognosReportID_do</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>GetWellName_do</servlet-name>
+    <url-pattern>/GetWellName_do</url-pattern>
   </servlet-mapping>
 </web-app>

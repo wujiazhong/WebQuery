@@ -1,6 +1,9 @@
 package dao;
 
 /*import java.io.FileInputStream;*/
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.sql.*;
 
 import db_connection.DB_Connection;
@@ -8,14 +11,20 @@ import t_user.T_User;
 import net.sf.json.JSONException;
 import net.sf.json.JSONObject;
 import net.sf.json.JSONArray;
+
 import java.util.regex.*;
 import java.util.ArrayList;
 import java.util.List;
 /*import java.io.FileReader;
-import java.io.BufferedReader;
-import java.io.IOException;*/
+import java.io.BufferedReader;*/
 import java.util.Date;
+import java.util.Properties;
 import java.text.SimpleDateFormat;
+
+import db_conn_properties.DB_Conn_Properties;
+/*import java.util.Properties;
+import java.io.FileInputStream;
+import java.io.File;*/
 
 public class DAO {
 /*	private String db_driver = "com.mysql.jdbc.Driver";
@@ -23,16 +32,58 @@ public class DAO {
 	private String db_user = "root";
 	private String db_pwd = "123";
 	private String db_table = "login_info";*/
-	private final String db_driver = "com.ibm.db2.jcc.DB2Driver";
-	private final String db_url = "jdbc:db2://9.110.83.168:50000/PMQNEW";
-	private final String db_user = "db2inst1";
-	private final String db_pwd = "db2inst1";
+/*	private String db_driver = "com.ibm.db2.jcc.DB2Driver";
+	private String db_url = "jdbc:db2://9.110.83.168:50000/PMQNEW";
+	private String db_user = "db2inst1";
+	private String db_pwd = "db2inst1";*/
+	
+	private String db_driver = "";
+	private String db_url = "";
+	private String db_user = "";
+	private String db_pwd = "";
+	
+	public DAO(){
+		
+	}
+	
+	public DAO(DB_Conn_Properties db_conn){
+		db_driver = db_conn.getDb_driver();
+		db_url = db_conn.getDb_url();
+		db_user = db_conn.getDb_user();
+		db_pwd = db_conn.getDb_pwd();
+	}
+	
+	/*public void initDBConnPara(){
+		Properties prop = new Properties();
+		File file = new File("db_conn.properties");	
+		String ConfFilePath = file.getAbsolutePath();		
+		String ConfFilePath = "db_conn.properties";
+		try{
+			String path = DAO.class.getClassLoader().getResource("").toURI().getPath();
+			System.out.println("path:"+path);
+			File new_file = new File(path + ConfFilePath);
+			FileInputStream in = new FileInputStream(new_file);
+			System.out.println(new_file.getAbsolutePath());
+
+			try{
+				prop.load(in);
+				this.db_driver = prop.getProperty("DBDriver");
+				this.db_url = prop.getProperty("DBUrl");
+				this.db_user = prop.getProperty("DBUsername");
+				this.db_pwd = prop.getProperty("DBPassword");
+				
+			}catch(Exception e){
+				e.printStackTrace();
+			}
+		}catch(Exception e){
+			e.printStackTrace();
+		}	
+	}*/
 	
 	public boolean verifyUser(final String username, final String password){
 		boolean isVerified = false;
-		System.out.println("before conn");
 		Connection conn = DB_Connection.getConnection(this.db_driver, this.db_url, this.db_user, this.db_pwd);
-		System.out.println("after conn");
+
 		Statement stm= null;
 	    ResultSet rs =null;
 		
@@ -67,15 +118,19 @@ public class DAO {
 	    T_User user = new T_User(username);
 	    
 	    try{
-			String sql ="select * from DB2INST1.T_USER where USERNAME='"+username+"'";
+	    	String sql = "select T0.*, T1.USERTEAM, T1.USERTEAM_NAME "
+	    			   + "from DB2INST1.T_USER T0, DB2INST1.T_USERTEAM T1 "
+	    			   + "where T0.USERNAME='"+username+"' and T0.USERTEAM = T1.USERTEAM";
 			stm = conn.createStatement();
 	        rs = stm.executeQuery(sql);
+	        System.out.println(sql);
 	        if(rs.next())
 	        {
 	        	user.setUserTeam(rs.getString("USERTEAM"));
 	        	user.setUserType(rs.getString("USERTYPE"));
 	        	user.setName(rs.getString("NAME"));
 	        	user.setGender(rs.getString("GENDER"));
+	        	user.setUserteamName(rs.getString("USERTEAM_NAME"));
 	        	
 	        	sql ="select distinct UNION_CODE from DB2INST1.T_PREDICT where USERTEAM='"+user.getUserTeam()+"'";
 	        	rs_union_code = stm.executeQuery(sql);
@@ -236,7 +291,9 @@ public class DAO {
 					  + "where JH in (select JH from T_USERTEAM_WELL where USERTEAM = '"+userteam+"') order by 1";
 			System.out.println(sql);
 			stm = conn.createStatement();
+			System.out.println("DB2INST1.T_DDCC03: "+sql);
 	        rs = stm.executeQuery(sql);
+	        
 	        
 	        while(rs.next())
 	        {
@@ -521,7 +578,8 @@ public class DAO {
 		        			String sql_del_old_records = "delete from DB2INST1.T_INDI_ADD_DIAGRAM "
 		        					                   + "where (JH='"+well_name+"' and UNION_CODE='"+unioncode+"' and INDICATOR_OVERLAP_ID="+indi_id+")";
 		        			System.out.println("del:"+sql_del_old_records);
-		        			stm.executeUpdate(sql_del_old_records);
+		        			int test = stm.executeUpdate(sql_del_old_records);
+		        			System.out.println("del entries: "+test);
 		        			System.out.println("del old records");
 	        			}
 	        			
@@ -626,8 +684,6 @@ public class DAO {
 	
 	public boolean UpdateOperationDate(final String oper, final String json_str, final String userteam, final String unioncode){
 		JSONArray jsonArray = JSONArray.fromObject(json_str);
-		System.out.println("jsonArray size: "+jsonArray.size());
-		System.out.println("jsonStr: "+json_str);
 		boolean isSuccess = false;
 		String db_table_name = "";
 		String db_action = "";
@@ -766,9 +822,63 @@ public class DAO {
 		return isSuccess;
 	}
 	
-	public String parseGeneralUriFromPropertiesFile(final String userteam, final String properties_file_path){
-		String uri = "";		
-
-		return uri;
+	public String getCognosReportID(final String userteam, final String report_id_uri){
+		String report_id = "";		
+		Properties prop = new Properties();
+		if(report_id_uri != null){
+			try{
+				File db_conn = new File(report_id_uri);
+				System.out.println(report_id_uri);
+				FileInputStream in = new FileInputStream(db_conn);
+				try{
+					prop.load(in);
+					report_id = prop.getProperty(userteam);
+					System.out.println(">>>>id"+report_id);
+				}catch(Exception e){
+					e.printStackTrace();
+				}
+				
+			}catch(FileNotFoundException e){
+				e.printStackTrace();
+			}
+		}
+		
+		return report_id;
+	}
+	
+	public JSONObject GetWellName(final String userteam){
+		JSONObject jsonObj = new JSONObject();
+		
+		Connection conn = DB_Connection.getConnection(this.db_driver, this.db_url, this.db_user, this.db_pwd);
+		Statement stm= null;
+	    ResultSet rs =null;
+	    String key = "first_well_name";
+		String first_well_name = "";
+	    
+	    try{
+	    	String sql = "select distinct JH from DB2INST1.T_INDI_ADD_MAIN where USERTEAM='"+userteam+"' order by 1";    	
+	    	stm = conn.createStatement();
+	        rs = stm.executeQuery(sql);
+	        
+	        if(rs.next()){
+	        	try{
+	        		first_well_name = rs.getString("JH");
+	        		jsonObj.put(key, first_well_name);
+	        	}catch(JSONException e){
+	        		e.printStackTrace();
+	        	}
+	        }
+	    }catch(SQLException e){
+	    	e.printStackTrace();
+	    }finally{
+	    	try{
+				stm.close();
+				conn.close();
+			}catch(SQLException e){
+				System.out.println("there is a sql error!");
+				e.printStackTrace();
+			}
+	    }	
+		return jsonObj;
 	}
 }

@@ -53,17 +53,15 @@
     	<script type="text/javascript" src="js/method.js"></script>
     	<script type="text/javascript" src="js/jquery.multiselect2side.js"></script>
     	<script type="text/javascript" src="js/browser.js"></script>
+    	<script type="text/javascript" src="config/raw_url.js"></script>
+    	<script type="text/javascript" src="js/jquery.tooltip.js"></script>
     	<script type="text/javascript">	
     		$(document).ready(function(){
     			well_name = $("#well_index").find("option:selected").text();
 				well_date = $("#well_check_date").find("option:selected").text();
     			var well_info = [];
         		var well_index_list = [];
-        		var cognos_diag_url_test2 = "http://9.110.83.168/ibmcognos/cgi-bin/cognos.cgi?b_action=cognosViewer&ui.action=run&ui.object=%2fcontent%2ffolder[%40name%3d'PMQ_WELL']%2ffolder[%40name%3d'INDICATOR']%2freport[%40name%3d'Indi_diagram1']&ui.name=test&run.outputFormat=&run.prompt=false&p_pDiagram_ID=11433&cv.toolbar=false&cv.header=false";  
-        		var cognos_diag_url = "http://9.110.83.168/ibmcognos/cgi-bin/cognos.cgi?b_action=cognosViewer&ui.action=run&ui.object=%2fcontent%2ffolder%5b%40name%3d%27PMQ_WELL%27%5d%2ffolder%5b%40name%3d%27INDICATOR%27%5d%2freport%5b%40name%3d%27Indi_diagram1%27%5d&ui.name=Indi_diagramreport_id&&run.outputFormat=&run.prompt=false&p_pDiagram_ID=diag_id&cv.toolbar=false&cv.header=false";
-        		//var cognos_diag_url_test = "http://9.110.83.168/ibmcognos/cgi-bin/cognos.cgi?b_action=cognosViewer&ui.action=view&ui.object=defaultOutput(%2fcontent%2ffolder[%40name%3d'PMQ_WELL']%2ffolder[%40name%3d'INDICATOR']%2freport[%40name%3d'Indi_diagram1'])&ui.name=Indi_diagram2&ui.format=CSV&cv.toolbar=false&cv.header=false&p_pDiagram_ID=diag_id";  
         		
-        		var cognos_diag_url_bk = "http://9.110.83.168/ibmcognos/cgi-bin/cognos.cgi?b_action=cognosViewer&ui.action=run&ui.object=%2fcontent%2fpackage[%40name%3d%27PMQXJ%27]%2ffolder[%40name%3d%27yulong%27]%2freport[%40name%3d%27shigongtu_test%27]&ui.name=shigongtu_test&run.outputFormat=&run.prompt=false&p_pDiagram_ID=diag_id&cv.toolbar=false&cv.header=false" 
     			$("<span>").text($.cookie("userteam")).appendTo($("#container_title div[id='userteam']"));
     			function sortDescend(menu_list){
     				var reg = /[^0-9]/ig;
@@ -103,7 +101,8 @@
     				});
     				return check_date_list;
     			}
-    			    			
+    			
+    			
     			$.ajax({
     			  type: "post",
                   url:  "GetWellInfo_do",
@@ -141,8 +140,15 @@
 		 								if(index == -1){
 		 									isOK = false;
 		 								}else{
+		 									var max_char_num = 15;
+		 									var content = "";
+		 									if(val.well_content[index].length>max_char_num){
+		 										content = val.well_content[index].substring(0,11)+" ...";
+		 									}
+		 									
 		 									$("#well_oper").text(val.well_oper[index]);
-		 									$("#well_content").text(val.well_content[index]);
+		 									$("#well_content").text(content);
+		 									$("#well_content").ToolTips(val.well_content[index]);
 		 								}
 		 								
 		 							}
@@ -196,11 +202,10 @@
                         	alert("向数据库请求数据失败！");
                         	$("#close_btn").trigger("click");
                         }, 1000);
-                        window.open("homepage.html?user="+$.cookie("user"));
                   }
     			});
     			
-    			$("#fix_date_btn").on('click', function(){				
+    			$("#fix_date_btn").unbind("click").on('click', function(){	
     				$("#diag_container").empty();
     				$.ajax({
 	   	    			  type: "post",
@@ -212,12 +217,20 @@
 	   	                		alert("数据库没有找到该井号在这天的修井记录");								
 							}else{
 								sortAscend(data,"date");
+								var tot_diag_num = Number(0);
 								$.each(data,function(key, data_val){
 									var $row = $("<div>").addClass("diag_row").addClass("col-md-12").appendTo("#diag_container");
 									var $date_div = $("<div>").addClass("date_div").addClass("col-md-2 col-lg-2").text(data_val.date).appendTo($row);
 									var $img_div = $("<div>").addClass("img_div").addClass("col-md-12").appendTo($row);
-									
+																		
 									for(var i=0;i<data_val.time.length;i++){
+										tot_diag_num++;
+										console.log(tot_diag_num);
+										if(tot_diag_num%4 == 3){
+											console.log("in sleep");
+											setTimeout(function(){},500);	
+										}										
+										
 										var cur_img_url = cognos_diag_url.replace(/diag_id/,data_val.diag_id[i]);
 										cur_img_url = cur_img_url.replace(/report_id/, (i+1).toString());
 
@@ -231,8 +244,17 @@
 									}
 								});
 								$("#submit_diag_base").show();
+/* 								
+								var bind_num = 0;
+								var eventHandle = function(){
+									bind_num++;
+								    console.log("bind num:"+bind_num) 
+								}
 								
-								$("#submit_diag_base").on("click", function(){
+								document.getElementById("submit_diag_base").addEventListener("click",eventHandle,false); */
+								
+								$("#submit_diag_base").unbind("click").on("click", function(event){
+									event.preventDefault();
 									if($("input[name='diag_radio']:checked").length == 0)
 									{
 										alert("请选择一幅示功图作为基准！");
@@ -241,6 +263,7 @@
 									var sel_diagram_id = $("input[name='diag_radio']:checked").attr("value");
 									var basedate = $("input[name='diag_radio']:checked").parents(".img_div").siblings(".date_div").text();
 									var basetime = $("input[name='diag_radio']:checked").siblings("p").text();
+
 									$.ajax({
 									    type: "post",
 				   	                    url:  "SetBaseDiag_do",
@@ -252,14 +275,14 @@
 						   	            	$("input[name='diag_radio']").attr("disabled","disabled");
 						 				},
 				   	                    success: function(flag){
-				   	                    	$("#submit_diag_base").removeAttr("disabled");
-				   	                    	$("input[name='diag_radio']").removeAttr("disabled");
 				   	                		if(flag){
 				   	                			alert("设定基准示功图成功！");
 				   	                			
 				   	                		}else{
 				   	                			alert("设定基准示功图失败！");
 				   	                		}
+				   	                		$("#submit_diag_base").removeAttr("disabled");
+				   	                    	$("input[name='diag_radio']").removeAttr("disabled");
 				   	                    },
 				   	                    error: function(){
 				   	                    	alert("设定基准示功图失败！");	

@@ -3,29 +3,25 @@ package servlet;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-import db_conn_properties.DB_Conn_Properties;
-
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
+/*import javax.servlet.http.HttpSession;*/
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import dao.DAO;
+import db_conn_properties.DB_Conn_Properties;
 import net.sf.json.JSONException;
 import net.sf.json.JSONObject;
-import t_user.T_User;
 
-import org.apache.log4j.Logger;
-
-public class Login_do extends HttpServlet {
-	private static final long serialVersionUID = 1L;  
-	private static Logger logger = Logger.getLogger(Login_do.class);
+public class GetWellName_do extends HttpServlet {
+	private static final long serialVersionUID = 1L; 
 	private DB_Conn_Properties db_conn = null;
 	/**
 	 * Constructor of the object.
 	 */
-	public Login_do() {
+	public GetWellName_do() {
 		super();
 	}
 
@@ -65,60 +61,24 @@ public class Login_do extends HttpServlet {
 	public void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		// TODO Auto-generated method stub
-		String name=request.getParameter("username");
-		String pwd=request.getParameter("password");
 		request.setCharacterEncoding("utf-8"); 
 		response.setCharacterEncoding("utf-8");
 		response.setContentType("text/html; charset=utf-8");
-		
-		logger.debug("enter login_do action...");
-		DAO t_user_query = new DAO(db_conn);
-		
-		
-		try{
-			logger.debug("before verifyUser...");
-			boolean check_status = t_user_query.verifyUser(name, pwd) ? true : false;
-			JSONObject jsonObj = new JSONObject();
-			if(check_status){
-				try{
-					logger.debug("before queryUserInfo...");
-					T_User user = t_user_query.queryUserInfo(name);
-					logger.debug("after queryUserInfo");
-					
-					try {
-						jsonObj.put("msg", String.valueOf(check_status)); 
-						jsonObj.put("userteam", user.getUserTeam());
-						jsonObj.put("usertype", user.getUserType());
-						jsonObj.put("unioncode", user.getUnionCode());
-						jsonObj.put("userteam_name", user.getUserteamName());
-						
-						PrintWriter out = response.getWriter();
-						out.write(jsonObj.toString());
-						out.flush();
-						out.close();
-						out = null;
-					} catch (JSONException e) {
-						logger.error("fail to get information from database!");
-						e.printStackTrace();
-					}
-				}catch(Exception e){
-					logger.error("fail to queryUserInfo from database!");
-					e.printStackTrace();
-				}
-			}else{
-				logger.debug("no such user...");
-				jsonObj.put("msg", String.valueOf(check_status)); 
-				
-				PrintWriter out = response.getWriter();
-				out.write(jsonObj.toString());
-				out.flush();
-				out.close();
-				out = null;
-			} 
-		}catch (JSONException e) {
-			logger.error("fail to get information from database!");
+		final String userteam = request.getParameter("userteam");
+
+		DAO t_dao = new DAO(db_conn);
+		JSONObject well_name = t_dao.GetWellName(userteam);
+		System.out.println(well_name.toString());
+
+		try {
+			PrintWriter out = response.getWriter();
+			out.write(well_name.toString());
+			out.flush();
+			out.close();
+			out = null;
+		} catch (JSONException e) {
 			e.printStackTrace();
-		}		
+		}
 	}
 
 	/**
@@ -136,7 +96,6 @@ public class Login_do extends HttpServlet {
 
 		System.out.println(db_properties_location);
 		db_conn = new DB_Conn_Properties(db_properties_location);
-
 	}
 
 }

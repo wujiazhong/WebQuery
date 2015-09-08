@@ -1,4 +1,4 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
   <head>    
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -8,7 +8,7 @@
 	<link rel="stylesheet" href="css/jquery.multiselect2side.css" >
 	<link rel="stylesheet" type="text/css" href="./datatable/css/jquery.dataTables.css">
 	<link rel="stylesheet" href="css/style.css">
-	
+	<title>PMQ</title>
   </head>
   <body>			
 	<header>
@@ -19,7 +19,8 @@
 		   </div> -->
 		   <div class="navbar-header">
 			  <p class="navbar-text" id="username">用户名：</p>
-			  <p class="navbar-text" id="userteam">所属采油队：</p>
+			  <p class="navbar-text" id="usertype">用户类型：</p>
+			  <p class="navbar-text" id="userteam_name">所属采油队：</p>
 			  <p class="navbar-text"><a href="index.html">注销登录</a></p>
 		   </div>
 		</div>
@@ -47,7 +48,8 @@
     <script type="text/javascript">
     	$(document).ready(function(){			
 			document.getElementById("username").innerHTML = "用户名: "+ $.cookie("user");
-			document.getElementById("userteam").innerHTML = "所属采油队: "+ $.cookie("userteam");
+			document.getElementById("userteam_name").innerHTML = "所属采油队: "+ $.cookie("userteam_name");
+			document.getElementById("usertype").innerHTML = "用户类型: "+ $.cookie("usertype");
 			var usertype = $.cookie("usertype");
 			$.cookie("nav_link", "navigator.html");
 			var nav_link = $.cookie("nav_link");

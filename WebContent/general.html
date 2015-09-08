@@ -3,18 +3,36 @@
 	<body>
 		<!-- <iframe src="http://9.110.83.168/ibmcognos/cgi-bin/cognos.cgi/repository/sid/cm/rid/i2542476960E3417D9C16D691EE3F03FC/oid/iD8AD4F2F09104ECBB33AAFB9E477E866/content/mht/content?encoding=UTF-8" style="width:1440px;height:800px"></iframe> -->
 		<!-- <iframe src="http://9.110.83.168:9080/p2pd/servlet/dispatch/ext/repository/sid/cm/rid/i2542476960E3417D9C16D691EE3F03FC/oid/iD8AD4F2F09104ECBB33AAFB9E477E866/content/mht/content?encoding=UTF-8" style="width:1440px;height:800px"></iframe> -->
-		<!-- <iframe src="http://9.110.83.168:9080/p2pd/servlet/dispatch/ext/repository/sid/cm/rid/i2542476960E3417D9C16D691EE3F03FC/oid/i2C878A9BE4944683AB0C80C1C2B8E7B2/content/mht/content?encoding=UTF-8" style="width:1440px;height:800px"></iframe> -->
-		<!-- <iframe src="http://localhost:8080/mht/overview_104-en-us.mht" style="width:1440px;height:800px"></iframe> -->
+		<!-- <iframe src="http://9.110.83.168:9080/p2pd/servlet/dispatch/ext/repository/sid/cm/oid/i06BC2121BAED48A38FD14EB904B15FF9/content" style="width:1440px;height:800px"></iframe> -->
+		<iframe src="http://9.110.83.168:9080/p2pd/servlet/dispatch/ext/repository/sid/cm/rid/i06BC2121BAED48A38FD14EB904B15FF9/oid/default/content/mht/content"></iframe>.
 	</body>
 	<script type="text/javascript" src="./js/jquery.js"></script>
 	<script type="text/javascript" src="./datatable/js/jquery.dataTables.js"></script>
 	<script type="text/javascript" src="js/bootstrap.min.js"></script>
 	<script type="text/javascript" src="./js/jquery.cookie.js"></script>
+	<script type="text/javascript" src="config/raw_url.js"></script>
 	<script type="text/javascript">
-	$(document).ready(function(){  
-		/* $("#src").load("Overview_T01_2015_08_20T12434545.mht"); */
-		//window.open("http://www.baidu.com");<!-- "./Overview_T01_2015_08_20T12434545.mht" -->
-		//window.open("http://9.110.83.168/ibmcognos/cgi-bin/cognos.cgi/repository/sid/cm/rid/i2542476960E3417D9C16D691EE3F03FC/oid/i2E605CDA21F141E59C730B3AEE933457/content/mht/content?encoding=UTF-8", "_blank");
+	$(document).ready(function(){ 
+		var screen_h = $("body").height();
+		$("iframe").css("height",parseInt(screen_h)+10);
+		
+		$.ajax({
+			type: "post",
+            url:  "GetCognosReportID_do",
+            data: {"userteam": $.cookie("userteam"), "report_id_uri": report_id_uri_windows},
+            dataType: "json",
+            success: function(data){
+            	if(data != undefined && data.msg == "true"){
+            		$("iframe").attr("src", raw_overview_url.replace("%report_id%",data.cognos_report_id));
+            	}else{
+            		alert("无法取得congnos中overview报表的id！");
+            	}
+            },
+            error: function(){
+            	alert("打开cognos报表失败！");
+            }
+		});
+
 	});
 	</script>
 </html>

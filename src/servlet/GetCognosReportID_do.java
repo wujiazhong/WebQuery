@@ -3,24 +3,21 @@ package servlet;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import dao.DAO;
-import db_conn_properties.DB_Conn_Properties;
 import net.sf.json.JSONException;
-import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
 
-public class GetDiagID_do extends HttpServlet {
+public class GetCognosReportID_do extends HttpServlet {
 	private static final long serialVersionUID = 1L;  
-	private DB_Conn_Properties db_conn = null;
 	/**
 	 * Constructor of the object.
 	 */
-	public GetDiagID_do() {
+	public GetCognosReportID_do() {
 		super();
 	}
 
@@ -63,16 +60,28 @@ public class GetDiagID_do extends HttpServlet {
 		request.setCharacterEncoding("utf-8"); 
 		response.setCharacterEncoding("utf-8");
 		response.setContentType("text/html; charset=utf-8");
-		final String unioncode = request.getParameter("unioncode");
-		final String well_name = request.getParameter("well_name");
-		final String well_date = request.getParameter("well_date");
-
-		DAO t_dao = new DAO(db_conn);
-		JSONArray diag_id_list = t_dao.getDiagID(unioncode, well_date, well_name);
+		final String userteam = request.getParameter("userteam");
+		final String report_id_uri = request.getParameter("report_id_uri");
+		JSONObject jsonObj = new JSONObject();
+		
+		DAO t_dao = new DAO();
+		String cognos_report_id = "";
+		cognos_report_id = t_dao.getCognosReportID(userteam,report_id_uri);
+		
+		try{
+			if(!cognos_report_id.equals("")){
+				jsonObj.put("msg", "true"); 
+				jsonObj.put("cognos_report_id", cognos_report_id);
+			}else{
+				jsonObj.put("msg", "false"); 
+			}
+		}catch (JSONException e) {
+			e.printStackTrace();
+		}
 		
 		try {
 			PrintWriter out = response.getWriter();
-			out.write(diag_id_list.toString());
+			out.write(jsonObj.toString());
 			out.flush();
 			out.close();
 			out = null;
@@ -86,16 +95,8 @@ public class GetDiagID_do extends HttpServlet {
 	 *
 	 * @throws ServletException if an error occurs
 	 */
-	public void init(ServletConfig config) throws ServletException {
+	public void init() throws ServletException {
 		// Put your code here
-		String db_properties_location = config.getInitParameter("db_conn_properties_location"); 
-		db_properties_location = Login_do.class.getResource("/"+db_properties_location).toString(); 
-		
-		//leave out "file:" in location string
-		db_properties_location = db_properties_location.substring(5);
-
-		System.out.println(db_properties_location);
-		db_conn = new DB_Conn_Properties(db_properties_location);
 	}
 
 }
