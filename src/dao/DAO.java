@@ -14,6 +14,7 @@ import net.sf.json.JSONArray;
 
 import java.util.regex.*;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 /*import java.io.FileReader;
 import java.io.BufferedReader;*/
@@ -497,167 +498,322 @@ public class DAO {
         String sys_cur_date = dateFormat.format(sys_date);
         String sys_cur_time = timeFormat.format(sys_date);
         String sys_curDateTime = datetimeFormat.format(sys_date);
+
+        Date cur_date = null;	
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+        try{
+        	 cur_date = df.parse(sys_cur_date);
+        }catch(Exception e){
+        	e.printStackTrace();
+        	System.out.println("error");
+        	System.exit(-1);
+        }
         
+        long time = cur_date.getTime()/1000 - 86400;
+        Long timestamp = Long.parseLong(Long.toString(time))*1000;
+		String yesterday_date = new SimpleDateFormat("yyyy-MM-dd").format(new Date(timestamp));
+		String yesterday_datetime = yesterday_date+" 00:00:00.0";
+		
+		int pastDayNum = 0;
+		try{
+			Calendar calendar = Calendar.getInstance();
+	        calendar.setTime(df.parse(yesterday_date));
+	        pastDayNum = calendar.get(Calendar.DAY_OF_MONTH);
+        }catch(Exception e){
+        	e.printStackTrace();
+        	System.out.println("error");
+        	System.exit(-1);
+        }
 	    
 	    try{
-	    	String sql_first_base = "select INDICATOR_BASE_ID from DB2INST1.T_USERTEAM_WELL T0 "
-					  			  + "where (JH='"+well_name+"' and UNION_CODE='"+unioncode+"')";
+	    	String sql_first_base = "select INDICATOR_BASE_ID from DB2INST1.T_USERTEAM_WELL where JH='"+well_name+"' and UNION_CODE='"+unioncode+"'";
+	    	String sql_sel_base_data = "SELECT distinct '"+sys_curDateTime+"' AS UPDATE_DATETIME, "
+	    		                  + "'"+sys_cur_date+"' AS UPDATE_DTAE, "
+	    		                  + "'"+sys_cur_time+"' AS UPDATE_TIME, "
+	    		                  + "'"+userteam+"' AS USERTEAM, "
+	    		                  + "'"+unioncode+"' AS UNION_CODE, "
+	    		                  + "'"+well_name+"' AS JH, "
+	    		                  + "'"+date_time+"' AS INDICATOR_BASE_DT, "
+	    		                  + "T1.P64 AS DAILY_LIQUID, "
+	    		                  + "T1.P65 AS DAILY_OIL, "
+	    		                  + "T1.P76 AS AVA_WATER_RATE, "
+	    		                  + "T1.P68/"+pastDayNum+" AS MONTH_AVA_LIQUID, "
+	    		                  + "T1.P69/"+pastDayNum+" AS MONTH_AVA_OIL, "    
+	    		                  + "T1.P21 AS PUMP_DIAMETER, "
+				    		      + "T1.P22 AS PUMP_DEEP, "
+				    		      + "T1.P25 AS PUMP_TYPE, "
+				    		      + "T2.WGRQ as PUMP_DATE, "
+				    		      + "'"+yesterday_date+"' as DAILY_DATE "
+				    		      + "FROM ( SELECT '"+sys_curDateTime+"' AS UPDATE_DATETIME, "
+				    		      + "'"+sys_cur_date+"' AS UPDATE_DTAE, "
+				    		      + "'"+sys_cur_time+"' AS UPDATE_TIME, " 
+	    		                  + "'"+userteam+"' AS USERTEAM, "
+	    		                  + "'"+unioncode+"' AS UNION_CODE, "
+	    		                  + "'"+well_name+"' AS JH, "
+	    		                  + "'"+date_time+"' AS INDICATOR_BASE_DT, " 
+				    		      + "T0.WGRQ as WGRQ, "
+	    		                  + "'"+yesterday_datetime+"' as DAILY_DATETIME, "
+				    		      + "'"+yesterday_date+"' as DAILY_DATE "
+				    		      + "from DB2INST1.T_DDCC03 T0 "
+				    		      + "where T0.WGRQ in (SELECT WGRQ FROM DB2INST1.T_DDCC03 WHERE (((CSMC = '维修') OR (CSMC = '检泵')) OR (CSMC = '新投')) and JH='"+well_name+"' ORDER BY 1 DESC fetch first 1 row only)) T2 "
+				    		      + "left outer join DB2INST1.T_DBAT3001 T1 on (T1.P03=T2.DAILY_DATETIME) and (T1.P02=T2.JH)";
 			
 			String sql_init_base = "update DB2INST1.T_USERTEAM_WELL set INDICATOR_BASE_ID='"+diag_id+"' "
 								 + "where (JH='"+well_name+"' and UNION_CODE='"+unioncode+"')";
-			
-			String sql_insert_base_diag_id = "insert into DB2INST1.T_INDI_ADD_MAIN (JH,USERTEAM,UNION_CODE,INDICATOR_BASE_DT,UPDATE_DATETIME,UPDATE_DATE,UPDATE_TIME) "
-					                       + "values ('"+well_name+"','"+userteam+"','"+unioncode+"', TO_DATE('"+date_time+"', 'YYYY-MM-DD HH24:MI:SS'), "
-					                       + "TO_DATE('"+sys_curDateTime+"', 'YYYY-MM-DD HH24:MI:SS'), "
-					                       + "'"+sys_cur_date+"', "
-					                       + "'"+sys_cur_time+"')";
-			
-			String sql_update_base_diag_id = "update DB2INST1.T_INDI_ADD_MAIN "
-					                       + "set INDICATOR_BASE_DT=TO_DATE('"+date_time+"', 'YYYY-MM-DD HH24:MI:SS'),"
-					                       + "UPDATE_DATETIME = TO_DATE('"+sys_curDateTime+"', 'YYYY-MM-DD HH24:MI:SS'),"
-					                       + "UPDATE_DATE = '"+sys_cur_date+"',"
-					                       + "UPDATE_TIME=  '"+sys_cur_time+"' "
-					                       + "where JH='"+well_name+"'";
+						
 			
 			String sql_query_indi_id = "select INDICATOR_OVERLAP_ID from DB2INST1.T_INDI_ADD_MAIN "
 					                 + "where (JH='"+well_name+"' and UNION_CODE='"+unioncode+"')";
 			
 			stm = conn.createStatement();
 	        rs = stm.executeQuery(sql_first_base);
-	        
+	        System.out.println("set base id "+sql_first_base);
 	        boolean isFirstTimeSetBaseDiag = false;
 	        if(rs.next()){
 	        	int indi_base_id = rs.getInt("INDICATOR_BASE_ID");
-	        	stm.executeUpdate(sql_init_base);
-	        	if(indi_base_id == -1){
-	        		System.out.println(sql_insert_base_diag_id);
-	        		stm.executeUpdate(sql_insert_base_diag_id);
-	        		isFirstTimeSetBaseDiag = true;
-	        	}else{
-	        		stm.executeUpdate(sql_update_base_diag_id);
-	        	}
-	        	System.out.println("after update base_id in T_INDI_ADD_MAIN");
-	        	System.out.println(sql_query_indi_id);
-	        	rs_query = stm.executeQuery(sql_query_indi_id);
-	        	if(rs_query.next()){
-	        		int indi_id = rs_query.getInt("INDICATOR_OVERLAP_ID");
-	        		System.out.println("overlap-id: "+indi_id);
-	        		String sql_sel_base = "SELECT T0.P07 AS CHONGCHENG,"
-							            + "T0.P08 AS CHONGCI,"
-							            + "T1.DIAGRAM_ID AS DIAGRAM_ID,"
-							            + "T1.LOAD_MAX AS LOAD_MAX,"
-							            + "T1.LOAD_MIN AS LOAD_MIN,"
-							            + "T1.ELECTRICITY_MAX AS ELECTRICITY_MAX,"
-							            + "T1.ELECTRICITY_MIN AS ELECTRICITY_MIN,"
-							            + "T1.AREA AS AREA,"
-							            + "T0.P01 AS P01,"
-							            + "T0.P02 AS P02,"
-							            + "T0.P03 AS P03,"
-							            + indi_id + " AS INDICATOR_OVERLAP_ID,"
-							            + "'"+userteam+"'" + " AS USERTEAM,"
-							            + "0 AS LOAD_MIN_ADD,"
-							            + "0 AS LOAD_MAX_ADD,"
-							            + "0 AS INDICATOR_ID,"
-							            + "0 AS AREA_ADD "
-	        		                    + "FROM  DB2INST1.T_DBAT2071 T0, DB2INST1.T_DBAT2070 T1 "
-	        	                        + "WHERE (((T1.P03 = TO_DATE('"+date_time+"', 'YYYY-MM-DD HH24:MI:SS')) " 
-	        	                        + "AND (T1.P01 = '"+unioncode+"')) " 
-	        				            + "AND (T1.P02 = '"+well_name+"')) " 
-	        			                + "AND (T0.P01 = T1.P01) " 
-	        			                + "AND (T0.P02 = T1.P02) " 
-	        			                + "AND (T0.P03 = T1.P03)";
-	        		System.out.println(sql_sel_base);
-	        		rs_sel_base = stm.executeQuery(sql_sel_base);
-	        		System.out.println("obtain base info in 2070 and 2071");
-	        		if(rs_sel_base.next()){
-	        			double load_max = rs_sel_base.getDouble("LOAD_MAX");
-	        			double load_min = rs_sel_base.getDouble("LOAD_MIN");
-	        			//delete old records of diagram in T_INDI_ADD_DIAGRAM
-	        			System.out.println(isFirstTimeSetBaseDiag);
-	        			if(!isFirstTimeSetBaseDiag){
-		        			String sql_del_old_records = "delete from DB2INST1.T_INDI_ADD_DIAGRAM "
-		        					                   + "where (JH='"+well_name+"' and UNION_CODE='"+unioncode+"' and INDICATOR_OVERLAP_ID="+indi_id+")";
-		        			System.out.println("del:"+sql_del_old_records);
-		        			int test = stm.executeUpdate(sql_del_old_records);
-		        			System.out.println("del entries: "+test);
-		        			System.out.println("del old records");
-	        			}
-	        			
-	        			
-	        			
-	        			String sql_get_diag = "SELECT T0.P07 AS CHONGCHENG, "
-			                                + "T0.P08 AS CHONGCI, "
-			                                + "T1.DIAGRAM_ID AS DIAGRAM_ID, "
-			                                + "T1.LOAD_MAX AS LOAD_MAX, "
-			                                + "T1.LOAD_MIN AS LOAD_MIN, "
-			                                + "T1.ELECTRICITY_MAX AS ELECTRICITY_MAX, "
-			                                + "T1.ELECTRICITY_MIN AS ELECTRICITY_MIN, "
-			                                + "T1.AREA AS AREA,T0.P01 AS P01,T0.P02 AS P02,T0.P03 AS P03, "
-			                                + indi_id + " AS INDICATOR_OVERLAP_ID, "
-			                                + "'"+userteam+"'" + " AS USERTEAM, "
-			                                + "(T1.LOAD_MIN - "+load_max+") AS LOAD_MIN_ADD, "
-			                                + "(T1.LOAD_MAX - "+load_min+") AS LOAD_MAX_ADD, "
-			                                + "(T1.AREA - 0.00000000000000000000e+00) AS AREA_ADD "
-			    				            + "FROM DB2INST1.T_DBAT2071 T0,DB2INST1.T_DBAT2070 T1 "
-			    				            + "WHERE (((T1.P01 = '"+unioncode+"') AND (T1.P02 = '"+well_name+"')) "
-			    				            + "AND (TIMESTAMPDIFF(2,CHAR(TIMESTAMP(T0.P03)-TIMESTAMP('"+date_time+"')))>=0)) " 
-			    					        + "AND (T0.P01 = T1.P01) AND (T0.P02 = T1.P02) AND (T0.P03 = T1.P03) ORDER BY 11 ASC";
-	        			System.out.println("diag:"+sql_get_diag);
-	        			rs_get_diag = stm.executeQuery(sql_get_diag);
-	        			System.out.println("get update info whose date>basedate");
-	        			
-	        			String sql_insert_diag = "INSERT INTO DB2INST1.T_INDI_ADD_DIAGRAM "
-	        					               + "(INDICATOR_OVERLAP_ID,USERTEAM,UNION_CODE,JH,INDICATOR_ID,DIAGRAM_ID,COLLECT_DATETIME,LOAD_MAX,LOAD_MIN,ELECTRICITY_MAX,ELECTRICITY_MIN,CHONGCHENG,CHONGCI,LOAD_MAX_ADD,LOAD_MIN_ADD,AREA,AREA_ADD) " 
-	        					               + "VALUES ";
-	        			System.out.println("insert info whose date>basedate");
-	        			int indi_id_index = 0;
-	        			while(rs_get_diag.next()){
-	        				System.out.println("it is "+indi_id_index+"insert data");
-	        				String value = " (";
-	        				int rs_indi_overlap_id = rs_get_diag.getInt("INDICATOR_OVERLAP_ID");
-	        				value += rs_indi_overlap_id + ",";
-	        				String rs_userteam = userteam;
-	        				value += "'"+rs_userteam + "',";
-	        				String rs_unioncode = unioncode;
-	        				value += "'"+rs_unioncode + "',";
-	        				String rs_jh = well_name;
-	        				value += "'"+rs_jh + "',";
-	        				int rs_indi_id = indi_id_index++;
-	        				value += rs_indi_id + ",";
-	        				int rs_diag_id = rs_get_diag.getInt("DIAGRAM_ID");
-	        				value += rs_diag_id + ",";
-	        				String rs_collect_time = rs_get_diag.getString("P03");
-	        				value += "'"+rs_collect_time + "',";
-	        				double rs_load_max = rs_get_diag.getDouble("LOAD_MAX");
-	        				value += rs_load_max + ",";
-	        				double rs_load_min = rs_get_diag.getDouble("LOAD_MIN");
-	        				value += rs_load_min + ",";
-	        				double rs_elec_max = rs_get_diag.getDouble("ELECTRICITY_MAX");
-	        				value += rs_elec_max + ",";
-	        				double rs_elec_min = rs_get_diag.getDouble("ELECTRICITY_MIN");
-	        				value += rs_elec_min + ",";
-	        				double rs_chongcheng = rs_get_diag.getDouble("CHONGCHENG");
-	        				value += rs_chongcheng + ",";
-	        				double rs_chongci = rs_get_diag.getDouble("CHONGCI");
-	        				value += rs_chongci + ",";
-	        				double rs_load_max_add = rs_get_diag.getDouble("LOAD_MAX_ADD");
-	        				value += rs_load_max_add + ",";
-	        				double rs_load_min_add = rs_get_diag.getDouble("LOAD_MIN_ADD");
-	        				value += rs_load_min_add + ",";
-	        				double rs_area = rs_get_diag.getDouble("AREA");
-	        				value += rs_area + ",";
-	        				double rs_area_add = rs_get_diag.getDouble("AREA_ADD");
-	        				value += rs_area_add + ")";
-	        				/*System.out.println(value);*/
-	        				stm.addBatch(sql_insert_diag+value);
-	        			}
-	        			stm.executeBatch();
-	        			System.out.println("all finish");
-	        		}
-	        		
-	        		
-	        	}
 	        	
+	        	try{
+	        		System.out.println(sql_sel_base_data);
+	        		rs = stm.executeQuery(sql_sel_base_data);
+	        		
+	        		if(rs.next()){
+	        			double saily_liq = rs.getDouble("DAILY_LIQUID");
+	    	        	double saily_oil = rs.getDouble("DAILY_OIL");
+	    	        	double avag_rate = rs.getDouble("AVA_WATER_RATE");
+	    	        	double avag_liq = rs.getDouble("MONTH_AVA_LIQUID");
+	    	        	if(rs.wasNull() ||  avag_liq== 0.0){
+	    	        		avag_liq = 1.0;
+	    	        	}
+	    	        	double avag_oil = rs.getDouble("MONTH_AVA_OIL");
+	    	        	if(rs.wasNull() ||  avag_oil== 0.0){
+	    	        		avag_oil = 1.0;
+	    	        	}
+	    	        	double pump_dia = rs.getDouble("PUMP_DIAMETER");
+	    	        	double pump_deep = rs.getDouble("PUMP_DEEP");
+	    	        	String pump_type = rs.getString("PUMP_TYPE");
+	    	        	if(rs.wasNull()){
+	    	        		pump_type = "";
+	    	        	}
+	    	        	String pump_date = rs.getString("PUMP_DATE");
+	    	        	String daily_date = rs.getString("DAILY_DATE");
+	    	        	
+			        	stm.executeUpdate(sql_init_base);
+			        	if(indi_base_id == -1){
+			        		String sql_insert_base_diag_id = "insert into DB2INST1.T_INDI_ADD_MAIN (JH,USERTEAM,UNION_CODE,INDICATOR_BASE_DT,UPDATE_DATETIME,UPDATE_DATE,UPDATE_TIME"
+									   + "DAILY_LIQUID,DAILY_OIL,AVA_WATER_RATE,MONTH_AVA_LIQUID,MONTH_AVA_OIL,PUMP_DIAMETER,PUMP_DEEP,PUMP_TYPE,PUMP_DATE,DAILY_DATE) "
+				                       + "values ('"+well_name+"','"+userteam+"','"+unioncode+"', TO_DATE('"+date_time+"', 'YYYY-MM-DD HH24:MI:SS'), "
+				                       + "TO_DATE('"+sys_curDateTime+"', 'YYYY-MM-DD HH24:MI:SS'), "
+				                       + "'"+sys_cur_date+"', "
+				                       + "'"+sys_cur_time+"')";
+			        		sql_insert_base_diag_id += ","+saily_liq+","+saily_oil+","+avag_rate+","+avag_liq+","+avag_oil+","+pump_dia+","+pump_deep+",'"+pump_type+"','"+pump_date+"','"+daily_date;
+			        		
+			        		System.out.println(sql_insert_base_diag_id);
+			        		stm.executeUpdate(sql_insert_base_diag_id);
+			        		isFirstTimeSetBaseDiag = true;
+			        	}else{
+			        		String sql_update_base_diag_id = "update DB2INST1.T_INDI_ADD_MAIN "
+ 								    + "set INDICATOR_BASE_DT=TO_DATE('"+date_time+"', 'YYYY-MM-DD HH24:MI:SS'),"
+                                    + "UPDATE_DATETIME = TO_DATE('"+sys_curDateTime+"', 'YYYY-MM-DD HH24:MI:SS'),"
+                                    + "UPDATE_DATE ='"+sys_cur_date+"',"
+                                    + "DAILY_LIQUID="+saily_liq+", "
+                                    + "DAILY_OIL="+saily_oil+", "
+                                    + "AVA_WATER_RATE="+avag_rate+", "
+                                    + "MONTH_AVA_LIQUID="+avag_liq+", "
+                                    + "MONTH_AVA_OIL="+avag_oil+", "	
+                                    + "PUMP_DIAMETER="+pump_dia+", "
+                                    + "PUMP_DEEP="+pump_deep+", "
+                                    + "PUMP_TYPE='"+pump_type+"', "
+                                    + "PUMP_DATE='"+pump_date+"', "
+                                    + "DAILY_DATE='"+daily_date+"' "
+                                    + "where JH='"+well_name+"' and UNION_CODE='"+unioncode+"'";
+			        		System.out.println(sql_update_base_diag_id);
+			        		stm.executeUpdate(sql_update_base_diag_id);
+			        	}
+
+			        	System.out.println("after update base_id in T_INDI_ADD_MAIN");
+			        	System.out.println(sql_query_indi_id);
+			        	rs_query = stm.executeQuery(sql_query_indi_id);
+			        	
+			        	if(rs_query.next()){
+			        		int indi_id = rs_query.getInt("INDICATOR_OVERLAP_ID");
+			        		System.out.println("overlap-id: "+indi_id);
+			        		String sql_sel_base = "SELECT T1.LOAD_MAX AS LOAD_MAX,"
+									            + "T1.LOAD_MIN AS LOAD_MIN, "
+									            + "T1.AREA AS AREA "
+/*									            + "T1.ELECTRICITY_MAX AS ELECTRICITY_MAX,"
+									            + "T1.ELECTRICITY_MIN AS ELECTRICITY_MIN,"
+									            + "T1.AREA AS AREA,"
+									            + "T0.P01 AS P01,"
+									            + "T0.P02 AS P02,"
+									            + "T0.P03 AS P03,"
+									            + indi_id + " AS INDICATOR_OVERLAP_ID,"
+									            + "'"+userteam+"'" + " AS USERTEAM,"
+									            + "0 AS LOAD_MIN_ADD,"
+									            + "0 AS LOAD_MAX_ADD,"
+									            + "0 AS INDICATOR_ID,"
+									            + "0 AS AREA_ADD "*/
+			        		                    + "FROM  DB2INST1.T_DBAT2071 T0, DB2INST1.T_DBAT2070 T1 "
+			        	                        + "WHERE (((T1.P03 = TO_DATE('"+date_time+"', 'YYYY-MM-DD HH24:MI:SS')) " 
+			        	                        + "AND (T1.P01 = '"+unioncode+"')) " 
+			        				            + "AND (T1.P02 = '"+well_name+"')) " 
+			        			                + "AND (T0.P01 = T1.P01) " 
+			        			                + "AND (T0.P02 = T1.P02) " 
+			        			                + "AND (T0.P03 = T1.P03)";
+			        		System.out.println(sql_sel_base);
+			        		rs_sel_base = stm.executeQuery(sql_sel_base);
+
+			        		if(rs_sel_base.next()){
+			        			double load_max = Math.abs(rs_sel_base.getDouble("LOAD_MAX")) == 0.0 ? 1.0:Math.abs(rs_sel_base.getDouble("LOAD_MAX"));
+			        			double load_min = Math.abs(rs_sel_base.getDouble("LOAD_MIN")) == 0.0 ? 1.0:Math.abs(rs_sel_base.getDouble("LOAD_MIN"));
+			        			double area = Math.abs(rs_sel_base.getDouble("AREA")) == 0.0 ? 1.0:Math.abs(rs_sel_base.getDouble("AREA"));
+			        			//delete old records of diagram in T_INDI_ADD_DIAGRAM
+			        			System.out.println("load_max "+load_max);
+			        			System.out.println("load_min "+load_min);
+			        			System.out.println(isFirstTimeSetBaseDiag);
+			        			if(!isFirstTimeSetBaseDiag){
+				        			String sql_del_old_records = "delete from DB2INST1.T_INDI_ADD_DIAGRAM "
+				        					                   + "where (JH='"+well_name+"' and UNION_CODE='"+unioncode+"' and INDICATOR_OVERLAP_ID="+indi_id+")";
+				        			System.out.println("del:"+sql_del_old_records);
+				        			int test = stm.executeUpdate(sql_del_old_records);
+				        			System.out.println("del entries: "+test);
+				        			System.out.println("del old records");
+			        			}
+			        			
+			        			String sql_get_diag = "SELECT T1.CHONGCHENG AS CHONGCHENG, "
+			        								+ "T1.CHONGCI AS CHONGCI, "
+			        								+ "T1.DIAGRAM_ID AS DIAGRAM_ID, "
+			        								+ "T1.LOAD_MAX AS LOAD_MAX, "
+			        								+ "T1.LOAD_MIN AS LOAD_MIN, "
+			        								+ "T1.ELECTRICITY_MAX AS ELECTRICITY_MAX, "
+			        								+ "T1.ELECTRICITY_MIN AS ELECTRICITY_MIN, "
+			        								+ "T1.AREA AS AREA, "
+			        								+ "T1.UNION_CODE AS UNION_CODE, "
+			        								+ "T1.JH AS JH, "
+			        								+ "T1.COLLECT_TIME AS COLLECT_TIME, "
+			        								+ "T1.INDICATOR_OVERLAP_ID  AS INDICATOR_OVERLAP_ID, " 
+			        								+ "T1.USERTEAM AS USERTEAM, "
+					                                + "T1.LOAD_MIN_ADD AS LOAD_MIN_ADD, "
+					                                + "T1.LOAD_MAX_ADD AS LOAD_MAX_ADD, "
+					                                + "T1.AREA_ADD AS AREA_ADD, "
+					                                + "T2.P64 as DAILY_LIQUID, "
+					                                + "T2.P65 as DAILY_OIL, "
+					                                + "T2.P76 as AVA_WATER_RATE, "
+					                                + "TIMESTAMPDIFF(2,CHAR(TIMESTAMP('2015-03-17 00:00:00.0')-TIMESTAMP('1970-01-01 00:00:00.0'))) as DATETIME_SECOND "
+					                                + "FROM( "
+					                                + "SELECT T0.P07 AS CHONGCHENG, "
+					                                + "T0.P08 AS CHONGCI, "
+					                                + "T1.DIAGRAM_ID AS DIAGRAM_ID, "
+											        + "T1.LOAD_MAX AS LOAD_MAX, " 
+											        + "T1.LOAD_MIN AS LOAD_MIN, "
+											        + "T1.ELECTRICITY_MAX AS ELECTRICITY_MAX, "
+											        + "T1.ELECTRICITY_MIN AS ELECTRICITY_MIN, "
+											        + "T1.AREA AS AREA, "
+											        + "T0.P01 AS UNION_CODE, "
+											        + "T0.P02 AS JH, "
+											        + "T0.P03 AS COLLECT_TIME, "
+											        + indi_id+" AS INDICATOR_OVERLAP_ID, "
+											        + "'"+userteam +"' AS USERTEAM, "
+											        + "(T1.LOAD_MIN - "+load_min+")/"+load_min+" AS LOAD_MIN_ADD, " 
+											        + "(T1.LOAD_MAX - "+load_max+")/"+load_max+" AS LOAD_MAX_ADD, "
+											        + "(T1.AREA - "+area+")/"+area+" AS AREA_ADD, " 
+											        + "null as DAILY_LIQUID, "
+											        + "null as DAILY_OIL, "
+											        + "null as AVA_WATER_RATE "         
+											        + "from DB2INST1.T_DBAT2071 T0,DB2INST1.T_DBAT2070 T1 "
+											        + "WHERE (((T1.P01 = '"+unioncode+"') AND (T1.P02 = '"+well_name+"')) "
+											        + "AND (TIMESTAMPDIFF(2,CHAR(TIMESTAMP(T0.P03)-TIMESTAMP('"+date_time+"')))>=0)) "
+											        + "AND (T0.P01 = T1.P01) AND (T0.P02 = T1.P02) AND (T0.P03 = T1.P03) "
+											        + "AND (T1.LOAD_MAX>0 AND T1.LOAD_MAX is not null) "
+											        + "AND (T1.LOAD_MIN>0 and T1.LOAD_MIN is not null) ORDER BY COLLECT_TIME ASC "
+											        + ") T1 left outer join DB2INST1.T_DBAT3001 T2 "
+											        + "on (T1.UNION_CODE = T2.P01) and (T1.JH = T2.P02) and (DATE(T2.P03)=DATE(T1.COLLECT_TIME))";
+/*			        			String sql_get_diag = "SELECT T0.P07 AS CHONGCHENG, "
+					                                + "T0.P08 AS CHONGCI, "
+					                                + "T1.DIAGRAM_ID AS DIAGRAM_ID, "
+					                                + "T1.LOAD_MAX AS LOAD_MAX, "
+					                                + "T1.LOAD_MIN AS LOAD_MIN, "
+					                                + "T1.ELECTRICITY_MAX AS ELECTRICITY_MAX, "
+					                                + "T1.ELECTRICITY_MIN AS ELECTRICITY_MIN, "
+					                                + "T1.AREA AS AREA,T0.P01 AS P01,T0.P02 AS P02,T0.P03 AS P03, "
+					                                + indi_id + " AS INDICATOR_OVERLAP_ID, "
+					                                + "'"+userteam+"'" + " AS USERTEAM, "
+					                                + "(T1.LOAD_MIN - "+load_min+")/"+load_min+" AS LOAD_MIN_ADD, "
+					                                + "(T1.LOAD_MAX - "+load_max+")/"+load_max+" AS LOAD_MAX_ADD, "
+					                                + "(T1.AREA - 0.00000000000000000000e+00) AS AREA_ADD "
+					    				            + "FROM DB2INST1.T_DBAT2071 T0,DB2INST1.T_DBAT2070 T1 "
+					    				            + "WHERE (((T1.P01 = '"+unioncode+"') AND (T1.P02 = '"+well_name+"')) "
+					    				            + "AND (TIMESTAMPDIFF(2,CHAR(TIMESTAMP(T0.P03)-TIMESTAMP('"+date_time+"')))>=0)) " 
+					    					        + "AND (T0.P01 = T1.P01) AND (T0.P02 = T1.P02) AND (T0.P03 = T1.P03) "
+					    					        + "AND (T1.LOAD_MAX>0 AND T1.LOAD_MAX is not null) "
+					    					        + "AND (T1.LOAD_MIN>0 and T1.LOAD_MIN is not null) ORDER BY 11 ASC";*/
+			        			System.out.println("diag:"+sql_get_diag);
+			        			rs_get_diag = stm.executeQuery(sql_get_diag);
+			        			System.out.println("get update info whose date>basedate");
+			        			
+			        			String sql_insert_diag = "INSERT INTO DB2INST1.T_INDI_ADD_DIAGRAM "
+			        					               + "(INDICATOR_OVERLAP_ID,USERTEAM,UNION_CODE,JH,INDICATOR_ID,DIAGRAM_ID,COLLECT_DATETIME,"
+			        					               + "LOAD_MAX,LOAD_MIN,ELECTRICITY_MAX,ELECTRICITY_MIN,CHONGCHENG,CHONGCI,LOAD_MAX_ADD,LOAD_MIN_ADD,AREA,AREA_ADD, "
+			        					               + "DATETIME_SECOND,DAILY_LIQUID,DAILY_OIL,AVA_WATER_RATE) " 
+			        					               + "VALUES ";
+			        			System.out.println("insert info whose date>basedate");
+			        			int indi_id_index = 0;
+			        			while(rs_get_diag.next()){
+			        				System.out.println("it is "+indi_id_index+"insert data");
+			        				String value = " (";
+			        				int rs_indi_overlap_id = rs_get_diag.getInt("INDICATOR_OVERLAP_ID");
+			        				value += rs_indi_overlap_id + ",";
+			        				String rs_userteam = userteam;
+			        				value += "'"+rs_userteam + "',";
+			        				String rs_unioncode = unioncode;
+			        				value += "'"+rs_unioncode + "',";
+			        				String rs_jh = well_name;
+			        				value += "'"+rs_jh + "',";
+			        				int rs_indi_id = indi_id_index++;
+			        				value += rs_indi_id + ",";
+			        				int rs_diag_id = rs_get_diag.getInt("DIAGRAM_ID");
+			        				value += rs_diag_id + ",";
+			        				String rs_collect_time = rs_get_diag.getString("COLLECT_TIME");
+			        				value += "'"+rs_collect_time + "',";
+			        				double rs_load_max = rs_get_diag.getDouble("LOAD_MAX");
+			        				value += rs_load_max + ",";
+			        				double rs_load_min = rs_get_diag.getDouble("LOAD_MIN");
+			        				value += rs_load_min + ",";
+			        				double rs_elec_max = rs_get_diag.getDouble("ELECTRICITY_MAX");
+			        				value += rs_elec_max + ",";
+			        				double rs_elec_min = rs_get_diag.getDouble("ELECTRICITY_MIN");
+			        				value += rs_elec_min + ",";
+			        				double rs_chongcheng = rs_get_diag.getDouble("CHONGCHENG");
+			        				value += rs_chongcheng + ",";
+			        				double rs_chongci = rs_get_diag.getDouble("CHONGCI");
+			        				value += rs_chongci + ",";
+			        				double rs_load_max_add = rs_get_diag.getDouble("LOAD_MAX_ADD");
+			        				value += rs_load_max_add + ",";
+			        				double rs_load_min_add = rs_get_diag.getDouble("LOAD_MIN_ADD");
+			        				value += rs_load_min_add + ",";
+			        				double rs_area = rs_get_diag.getDouble("AREA");
+			        				value += rs_area + ",";
+			        				double rs_area_add = rs_get_diag.getDouble("AREA_ADD");
+			        				value += rs_area_add + ",";
+			        				double rs_datetime_sec = rs_get_diag.getDouble("DATETIME_SECOND");
+			        				value += rs_datetime_sec + ",";
+			        				double rs_daily_liq = rs_get_diag.getDouble("DAILY_LIQUID");
+			        				value += rs_daily_liq + ",";
+			        				double rs_daily_oil = rs_get_diag.getDouble("DAILY_OIL");
+			        				value += rs_daily_oil + ",";
+			        				double rs_ava_water_rate = rs_get_diag.getDouble("AVA_WATER_RATE");
+			        				value += rs_ava_water_rate + ")";
+			        				System.out.println(value);
+			        				stm.addBatch(sql_insert_diag+value);
+			        			}
+			        			stm.executeBatch();
+			        			System.out.println("all finish");
+			        		}
+		        		
+			        	}
+		        	}
+	        	} catch(SQLException e) {
+	        		e.printStackTrace();
+	        	}
 	        }
 	        
 	    }catch(SQLException e){
@@ -666,9 +822,9 @@ public class DAO {
 		}finally{
 			try{
 				rs.close();
-				rs_query.close();
+/*				rs_query.close();
 				rs_sel_base.close();
-				rs_get_diag.close();
+				rs_get_diag.close();*/
 				stm.close();
 				conn.close();
 			}catch(SQLException e){
