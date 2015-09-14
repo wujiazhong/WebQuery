@@ -574,7 +574,7 @@ select{
 		}
 		#diag_container .diag_wrapper iframe{
 			position: absolute;
-			top: -120px;
+			top: -100px;
 			left: -160px;
 			width: 510px;
 			height: 408px;

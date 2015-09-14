@@ -128,9 +128,12 @@
 
 							$("#well_check_date").change(function(event){
 								event.preventBubble=true;
+								$("#diag_container").empty();
+		 						$("#submit_diag_base").hide();
 		 						well_name = $("#well_index").find("option:selected").text();
 		 						well_date = $("#well_check_date").find("option:selected").text();
-
+		 						
+		 						
 		 						var check_date = $(this).find("option:selected").text();
 		 						var isOK = true;
 								
@@ -140,13 +143,13 @@
 		 								if(index == -1){
 		 									isOK = false;
 		 								}else{
-		 									var max_char_num = 15;
-		 									var content = "";
-		 									if(val.well_content[index].length>max_char_num){
-		 										content = val.well_content[index].substring(0,11)+" ...";
+		 									var max_char_num = 11;
+		 									var content = val.well_content[index];
+		 									if(content.length>max_char_num){
+		 										content = content.substring(0,max_char_num)+" ...";
 		 									}
 		 									
-		 									$("#well_oper").text(val.well_oper[index]);
+		 									$("#well_oper").text(val.well_oper[index]);						
 		 									$("#well_content").text(content);
 		 									$("#well_content").ToolTips(val.well_content[index]);
 		 								}
