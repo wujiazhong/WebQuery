@@ -3,12 +3,12 @@
 	<body>
 		 <div class="col-md-offset-1 col-md-10 container" id="update_today_data">
 		 	<br><br>
-			<button class="btn btn-default col-md-offset-5 col-md-2 col-lg-2">手动更新数据表</button><br><br>
+			<button class="btn btn-default col-md-offset-5 col-md-2 col-lg-2" id="mannual_update">手动更新数据表</button><br><br>
 		 	<div class="panel panel-default">
-			   <div class="panel-body">
+			   <div class="panel-body" id="panel_info">
 			      	没有数据更新的信息！
 			   </div>
-			   <div class="panel-footer">共有 0 个表的数据被手动更新</div>
+			   <div class="panel-footer" id="panel_result">共有 0 个表的数据被手动更新</div>
 			</div>
 		 </div>
 		 <div class="col-md-offset-1 col-md-10 container" id="update_oper_time">
@@ -103,7 +103,13 @@
   				 *This class used to stands for date data recorded in two tables
   				 *@ version
   				 *@ author
-  				 */				  				
+  				 */			
+  				var userinfo_list = unescape(getUrlParam("wd")).split(";");
+      			var userteam_name=userinfo_list[userinfo_index.userteam_name];
+      			var username=userinfo_list[userinfo_index.username];
+      			var userteam=userinfo_list[userinfo_index.userteam];
+      			var usertype=userinfo_list[userinfo_index.usertype];
+      			var unioncode = userinfo_list[userinfo_index.unioncode];
   				function jhOperDateObj(oper,well_name){
   					this.oper = oper; 
   					this.jh = well_name;
@@ -564,7 +570,7 @@
   				$.ajax({
     			  type: "post",
                   url:  "GetWellOperDate_do",
-                  data: {"userteam": $.cookie("userteam")},
+                  data: {"userteam": userteam},
                   dataType: "json",
                   success: function(data){
                         if(data.length == 0){
@@ -658,7 +664,7 @@
 				  			$.ajax({
 				  				type: "post",
 				                url:  "UpdateWellOperDate_do",
-				                data: {"json_str":xj_json,"userteam":$.cookie("userteam"),"unioncode": $.cookie("unioncode"),
+				                data: {"json_str":xj_json,"userteam":userteam,"unioncode": unioncode,
 				                	   "oper":"xj"},
 				                dataType: "json",
 				                success: function(flag){
@@ -686,7 +692,7 @@
 				  			$.ajax({
 				  				type: "post",
 				                url:  "UpdateWellOperDate_do",
-				                data: {"json_str":jl_json,"userteam":$.cookie("userteam"),"unioncode": $.cookie("unioncode"),
+				                data: {"json_str":jl_json,"userteam":userteam,"unioncode": unioncode,
 				                	   "oper":"jl"},
 				                dataType: "json",
 				                success: function(flag){
@@ -708,6 +714,32 @@
 			  			alert("向数据库请求数据失败！");
                   	}
             	});		
+  				
+  				
+  				
+  				
+  				//mannual update database
+  				$("#mannual_update").on("click", function(){
+  					$("#update_oper_time button").attr("disabled","disabled");
+  					$("#update_oper_time select").attr("disabled","disabled");
+  					$("#panel_info").text("正在更新数据库，大约需要几分钟时间，请稍后 ... ...");
+  					$.ajax({
+  						type: "post",
+		                url:  "UpdateDatabase_do",
+		                data: {},
+		                dataType: "json",
+		                success: function(stream){
+		                	if(stream.length != 0){
+		                		$("#panel_info").text(stream);
+		                	}else{
+		                		alert("手动更新数据库失败！");
+		                	}
+		                },
+		                error: function(){
+		                	alert("手动更新数据库失败！");
+		                }
+  					});
+  				});
 			});
   			
   			

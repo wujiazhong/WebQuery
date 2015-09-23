@@ -68,7 +68,6 @@ public class GetWellName_do extends HttpServlet {
 
 		DAO t_dao = new DAO(db_conn);
 		JSONObject well_name = t_dao.GetWellName(userteam);
-		System.out.println(well_name.toString());
 
 		try {
 			PrintWriter out = response.getWriter();
@@ -89,7 +88,7 @@ public class GetWellName_do extends HttpServlet {
 	public void init(ServletConfig config) throws ServletException {
 		// Put your code here
 		String db_properties_location = config.getInitParameter("db_conn_properties_location"); 
-		db_properties_location = Login_do.class.getResource("/"+db_properties_location).toString(); 
+		db_properties_location = GetWellName_do.class.getResource("/"+db_properties_location).toString(); 
 		
 		//leave out "file:" in location string
 		db_properties_location = db_properties_location.substring(5);

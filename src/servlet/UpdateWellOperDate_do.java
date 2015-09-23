@@ -96,7 +96,7 @@ public class UpdateWellOperDate_do extends HttpServlet {
 	public void init(ServletConfig config) throws ServletException {
 		// Put your code here
 		String db_properties_location = config.getInitParameter("db_conn_properties_location"); 
-		db_properties_location = Login_do.class.getResource("/"+db_properties_location).toString(); 
+		db_properties_location = UpdateWellOperDate_do.class.getResource("/"+db_properties_location).toString(); 
 		
 		//leave out "file:" in location string
 		db_properties_location = db_properties_location.substring(5);

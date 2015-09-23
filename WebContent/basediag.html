@@ -57,12 +57,18 @@
     	<script type="text/javascript" src="js/jquery.tooltip.js"></script>
     	<script type="text/javascript">	
     		$(document).ready(function(){
+    			var userinfo_list = unescape(getUrlParam("wd")).split(";");
+     			var userteam_name=userinfo_list[userinfo_index.userteam_name];
+     			var username=userinfo_list[userinfo_index.username];
+     			var userteam=userinfo_list[userinfo_index.userteam];
+     			var usertype=userinfo_list[userinfo_index.usertype];
+     			var unioncode = userinfo_list[userinfo_index.unioncode];
     			well_name = $("#well_index").find("option:selected").text();
 				well_date = $("#well_check_date").find("option:selected").text();
     			var well_info = [];
         		var well_index_list = [];
         		
-    			$("<span>").text($.cookie("userteam")).appendTo($("#container_title div[id='userteam']"));
+    			$("<span>").text(userteam).appendTo($("#container_title div[id='userteam']"));
     			function sortDescend(menu_list){
     				var reg = /[^0-9]/ig;
     				var list = menu_list;
@@ -106,7 +112,7 @@
     			$.ajax({
     			  type: "post",
                   url:  "GetWellInfo_do",
-                  data: {"userteam": $.cookie("userteam")},
+                  data: {"userteam": userteam},
                   dataType: "json",
                   beforeSend: function(){
                       $("#open_btn").trigger("click");
@@ -213,7 +219,7 @@
     				$.ajax({
 	   	    			  type: "post",
 	   	                  url:  "GetDiagID_do",
-	   	                  data: {"unioncode": $.cookie("unioncode"),"well_name":well_name,"well_date":well_date},
+	   	                  data: {"unioncode": unioncode,"well_name":well_name,"well_date":well_date},
 	   	                  dataType: "json",
 	   	                  success: function(data){
 	   	                	if(data.length == 0){
@@ -270,7 +276,7 @@
 									$.ajax({
 									    type: "post",
 				   	                    url:  "SetBaseDiag_do",
-				   	                    data: {"unioncode": $.cookie("unioncode"),"userteam":$.cookie("userteam"),
+				   	                    data: {"unioncode": unioncode,"userteam":userteam,
 				   	                    	   "diag_id":sel_diagram_id,"well_name":well_name,"basedate":basedate,"basetime":basetime},
 				   	                    dataType: "json",
 					   	                beforeSend: function(){

@@ -15,15 +15,20 @@
     	<script type="text/javascript" src="config/raw_url.js"></script>
     	<script type="text/javascript">    	
 		$(document).ready(function(){ 	
+			var userinfo_list = unescape(getUrlParam("wd")).split(";");
+ 			var userteam_name=userinfo_list[userinfo_index.userteam_name];
+ 			var username=userinfo_list[userinfo_index.username];
+ 			var userteam=userinfo_list[userinfo_index.userteam];
+ 			var usertype=userinfo_list[userinfo_index.usertype];
+ 			var unioncode = userinfo_list[userinfo_index.unioncode];
 			$.ajax({
 				type: "post",
                 url:  "GetWellName_do",
-                data: {"userteam": $.cookie("userteam")},
+                data: {"userteam": userteam},
                 dataType: "json",
                 success: function(data){
                 	if(data != undefined){
                 		var first_well_name = data.first_well_name;
-                		var userteam = $.cookie("userteam");
                 		
             			src_url = src_url.replace("%userteam%",userteam);
             			src_url = src_url.replace("%JH%",first_well_name);

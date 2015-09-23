@@ -9,7 +9,13 @@
     	<script type="text/javascript" src="config/raw_url.js"></script>
     	<script type="text/javascript">
     	$(document).ready(function(){
-    		$("iframe").attr("src", raw_prediction_url.replace("%userteam%", $.cookie("userteam")));
+    		var userinfo_list = unescape(getUrlParam("wd")).split(";");
+ 			var userteam_name=userinfo_list[userinfo_index.userteam_name];
+ 			var username=userinfo_list[userinfo_index.username];
+ 			var userteam=userinfo_list[userinfo_index.userteam];
+ 			var usertype=userinfo_list[userinfo_index.usertype];
+ 			var union_code = userinfo_list[userinfo_index.union_code];
+    		$("iframe").attr("src", raw_prediction_url.replace("%userteam%", userteam));
     		
     		var screen_h = $("body").height();
 			$("iframe").css("height",parseInt(screen_h)+10);

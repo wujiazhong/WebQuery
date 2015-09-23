@@ -1,10 +1,8 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
 	<body>
-		<!-- <iframe src="http://9.110.83.168/ibmcognos/cgi-bin/cognos.cgi/repository/sid/cm/rid/i2542476960E3417D9C16D691EE3F03FC/oid/iD8AD4F2F09104ECBB33AAFB9E477E866/content/mht/content?encoding=UTF-8" style="width:1440px;height:800px"></iframe> -->
-		<!-- <iframe src="http://9.110.83.168:9080/p2pd/servlet/dispatch/ext/repository/sid/cm/rid/i2542476960E3417D9C16D691EE3F03FC/oid/iD8AD4F2F09104ECBB33AAFB9E477E866/content/mht/content?encoding=UTF-8" style="width:1440px;height:800px"></iframe> -->
-		<!-- <iframe src="http://9.110.83.168:9080/p2pd/servlet/dispatch/ext/repository/sid/cm/oid/i06BC2121BAED48A38FD14EB904B15FF9/content" style="width:1440px;height:800px"></iframe> -->
-		<iframe src="http://9.110.83.168:9080/p2pd/servlet/dispatch/ext/repository/sid/cm/rid/i06BC2121BAED48A38FD14EB904B15FF9/oid/default/content/mht/content"></iframe>.
+		<iframe src=""></iframe>
+		<!-- "http://9.110.83.168:9080/p2pd/servlet/dispatch/ext/repository/sid/cm/rid/i06BC2121BAED48A38FD14EB904B15FF9/oid/default/content/mht/content" -->
 	</body>
 	<script type="text/javascript" src="./js/jquery.js"></script>
 	<script type="text/javascript" src="./datatable/js/jquery.dataTables.js"></script>
@@ -13,13 +11,19 @@
 	<script type="text/javascript" src="config/raw_url.js"></script>
 	<script type="text/javascript">
 	$(document).ready(function(){ 
+		var userinfo_list = unescape(getUrlParam("wd")).split(";");
+		var userteam_name=userinfo_list[userinfo_index.userteam_name];
+		var username=userinfo_list[userinfo_index.username];
+		var userteam=userinfo_list[userinfo_index.userteam];
+		var usertype=userinfo_list[userinfo_index.usertype];
+		var unioncode = userinfo_list[userinfo_index.unioncode];
 		var screen_h = $("body").height();
 		$("iframe").css("height",parseInt(screen_h)+10);
-		
+
 		$.ajax({
 			type: "post",
             url:  "GetCognosReportID_do",
-            data: {"userteam": $.cookie("userteam"), "report_id_uri": report_id_uri_windows},
+            data: {"userteam": userteam, "report_id_uri": report_id_uri},
             dataType: "json",
             success: function(data){
             	if(data != undefined && data.msg == "true"){

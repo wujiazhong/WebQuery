@@ -88,6 +88,16 @@
   	</init-param>
   </servlet>
   <servlet>
+    <description>Manually update database.</description>
+    <display-name>UpdateDatabase_do</display-name>
+    <servlet-name>UpdateDatabase_do</servlet-name>
+    <servlet-class>servlet.UpdateDatabase_do</servlet-class>
+	<init-param>
+  		<param-name>mb_config_path</param-name>
+  		<param-value>mb_config_path.properties</param-value>
+  	</init-param>
+  </servlet>
+  <servlet>
   	<description>Initialize log4J.</description>
   	<servlet-name>Log4JInitServlet</servlet-name>
   	<servlet-class>servlet.Log4JInitServlet</servlet-class>
@@ -129,5 +139,9 @@
   <servlet-mapping>
     <servlet-name>GetWellName_do</servlet-name>
     <url-pattern>/GetWellName_do</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>UpdateDatabase_do</servlet-name>
+    <url-pattern>/UpdateDatabase_do</url-pattern>
   </servlet-mapping>
 </web-app>

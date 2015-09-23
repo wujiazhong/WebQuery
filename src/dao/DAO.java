@@ -1,10 +1,13 @@
 package dao;
 
 /*import java.io.FileInputStream;*/
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.sql.*;
+import java.io.IOException;
 
 import db_connection.DB_Connection;
 import t_user.T_User;
@@ -53,33 +56,6 @@ public class DAO {
 		db_user = db_conn.getDb_user();
 		db_pwd = db_conn.getDb_pwd();
 	}
-	
-	/*public void initDBConnPara(){
-		Properties prop = new Properties();
-		File file = new File("db_conn.properties");	
-		String ConfFilePath = file.getAbsolutePath();		
-		String ConfFilePath = "db_conn.properties";
-		try{
-			String path = DAO.class.getClassLoader().getResource("").toURI().getPath();
-			System.out.println("path:"+path);
-			File new_file = new File(path + ConfFilePath);
-			FileInputStream in = new FileInputStream(new_file);
-			System.out.println(new_file.getAbsolutePath());
-
-			try{
-				prop.load(in);
-				this.db_driver = prop.getProperty("DBDriver");
-				this.db_url = prop.getProperty("DBUrl");
-				this.db_user = prop.getProperty("DBUsername");
-				this.db_pwd = prop.getProperty("DBPassword");
-				
-			}catch(Exception e){
-				e.printStackTrace();
-			}
-		}catch(Exception e){
-			e.printStackTrace();
-		}	
-	}*/
 	
 	public boolean verifyUser(final String username, final String password){
 		boolean isVerified = false;
@@ -185,9 +161,6 @@ public class DAO {
         			if(rs_well_name.equals(temp_obj.getString(well_name))){
         				isSameWell = true;
         				
-/*        				String str_date = temp_obj.getString(date);
-        				str_date += ","+rs_jl_date;
-        				temp_obj.put(date, str_date);*/
         				@SuppressWarnings("unchecked")
         				List <String> jl_date_list = (List<String>)temp_obj.get(date);
         				jl_date_list.add(rs_jl_date);
@@ -222,10 +195,7 @@ public class DAO {
         			JSONObject temp_obj = (JSONObject)jsonArray.get(i);
         			if(rs_oper.equals(temp_obj.getString(oper)) && rs_well_name.equals(temp_obj.getString(well_name))){
         				isSameWell = true;
-        				
-/*        				String str_date = temp_obj.getString(date);
-        				str_date += ","+rs_xj_date;
-        				temp_obj.put(date, str_date);*/
+
         				@SuppressWarnings("unchecked")
         				List <String> xj_date_list = (List<String>)temp_obj.get(date);
         				xj_date_list.add(rs_xj_date);
@@ -248,16 +218,6 @@ public class DAO {
 		        	}
         		}
 	        }
-/*	        
-	        for(int i=0;i<jsonArray.size();i++){
-	        	try{
-		        	JSONObject json_item = jsonArray.getJSONObject(i);
-		        	String str_check_date = json_item.getString(date);
-		        	json_item.put(date, str_check_date.split(","));
-	        	}catch(JSONException e){
-	        		e.printStackTrace();
-	        	}
-	        }*/
 	    }catch(SQLException e){
 			e.printStackTrace();
 		}finally{
@@ -555,9 +515,9 @@ public class DAO {
 	    		                  + "'"+yesterday_datetime+"' as DAILY_DATETIME, "
 				    		      + "'"+yesterday_date+"' as DAILY_DATE "
 				    		      + "from DB2INST1.T_DDCC03 T0 "
-				    		      + "where T0.WGRQ in (SELECT WGRQ FROM DB2INST1.T_DDCC03 WHERE (((CSMC = '维修') OR (CSMC = '检泵')) OR (CSMC = '新投')) and JH='"+well_name+"' ORDER BY 1 DESC fetch first 1 row only)) T2 "
+				    		      + "where T0.WGRQ in (SELECT WGRQ FROM DB2INST1.T_DDCC03 WHERE JH='"+well_name+"' ORDER BY 1 DESC fetch first 1 row only)) T2 "
 				    		      + "left outer join DB2INST1.T_DBAT3001 T1 on (T1.P03=T2.DAILY_DATETIME) and (T1.P02=T2.JH)";
-			
+
 			String sql_init_base = "update DB2INST1.T_USERTEAM_WELL set INDICATOR_BASE_ID='"+diag_id+"' "
 								 + "where (JH='"+well_name+"' and UNION_CODE='"+unioncode+"')";
 						
@@ -599,13 +559,13 @@ public class DAO {
 	    	        	
 			        	stm.executeUpdate(sql_init_base);
 			        	if(indi_base_id == -1){
-			        		String sql_insert_base_diag_id = "insert into DB2INST1.T_INDI_ADD_MAIN (JH,USERTEAM,UNION_CODE,INDICATOR_BASE_DT,UPDATE_DATETIME,UPDATE_DATE,UPDATE_TIME"
+			        		String sql_insert_base_diag_id = "insert into DB2INST1.T_INDI_ADD_MAIN (JH,USERTEAM,UNION_CODE,INDICATOR_BASE_DT,UPDATE_DATETIME,UPDATE_DATE,UPDATE_TIME, "
 									   + "DAILY_LIQUID,DAILY_OIL,AVA_WATER_RATE,MONTH_AVA_LIQUID,MONTH_AVA_OIL,PUMP_DIAMETER,PUMP_DEEP,PUMP_TYPE,PUMP_DATE,DAILY_DATE) "
 				                       + "values ('"+well_name+"','"+userteam+"','"+unioncode+"', TO_DATE('"+date_time+"', 'YYYY-MM-DD HH24:MI:SS'), "
 				                       + "TO_DATE('"+sys_curDateTime+"', 'YYYY-MM-DD HH24:MI:SS'), "
 				                       + "'"+sys_cur_date+"', "
-				                       + "'"+sys_cur_time+"')";
-			        		sql_insert_base_diag_id += ","+saily_liq+","+saily_oil+","+avag_rate+","+avag_liq+","+avag_oil+","+pump_dia+","+pump_deep+",'"+pump_type+"','"+pump_date+"','"+daily_date;
+				                       + "'"+sys_cur_time+"', ";
+			        		sql_insert_base_diag_id += saily_liq+","+saily_oil+","+avag_rate+","+avag_liq+","+avag_oil+","+pump_dia+","+pump_deep+",'"+pump_type+"','"+pump_date+"','"+daily_date+"')";
 			        		
 			        		System.out.println(sql_insert_base_diag_id);
 			        		stm.executeUpdate(sql_insert_base_diag_id);
@@ -686,7 +646,7 @@ public class DAO {
 					                                + "T2.P64 as DAILY_LIQUID, "
 					                                + "T2.P65 as DAILY_OIL, "
 					                                + "T2.P76 as AVA_WATER_RATE, "
-					                                + "TIMESTAMPDIFF(2,CHAR(TIMESTAMP('2015-03-17 00:00:00.0')-TIMESTAMP('1970-01-01 00:00:00.0'))) as DATETIME_SECOND "
+					                                + "TIMESTAMPDIFF(2,CHAR(TIMESTAMP(T1.COLLECT_TIME)-TIMESTAMP('1970-01-01 00:00:00.0'))) as DATETIME_SECOND "
 					                                + "FROM( "
 					                                + "SELECT T0.P07 AS CHONGCHENG, "
 					                                + "T0.P08 AS CHONGCI, "
@@ -703,7 +663,7 @@ public class DAO {
 											        + "'"+userteam +"' AS USERTEAM, "
 											        + "(T1.LOAD_MIN - "+load_min+")/"+load_min+" AS LOAD_MIN_ADD, " 
 											        + "(T1.LOAD_MAX - "+load_max+")/"+load_max+" AS LOAD_MAX_ADD, "
-											        + "(T1.AREA - "+area+")/"+area+" AS AREA_ADD, " 
+											        + "(abs(T1.AREA) - "+Math.abs(area)+")/"+Math.abs(area)+" AS AREA_ADD, " 
 											        + "null as DAILY_LIQUID, "
 											        + "null as DAILY_OIL, "
 											        + "null as AVA_WATER_RATE "         
@@ -715,25 +675,6 @@ public class DAO {
 											        + "AND (T1.LOAD_MIN>0 and T1.LOAD_MIN is not null) ORDER BY COLLECT_TIME ASC "
 											        + ") T1 left outer join DB2INST1.T_DBAT3001 T2 "
 											        + "on (T1.UNION_CODE = T2.P01) and (T1.JH = T2.P02) and (DATE(T2.P03)=DATE(T1.COLLECT_TIME))";
-/*			        			String sql_get_diag = "SELECT T0.P07 AS CHONGCHENG, "
-					                                + "T0.P08 AS CHONGCI, "
-					                                + "T1.DIAGRAM_ID AS DIAGRAM_ID, "
-					                                + "T1.LOAD_MAX AS LOAD_MAX, "
-					                                + "T1.LOAD_MIN AS LOAD_MIN, "
-					                                + "T1.ELECTRICITY_MAX AS ELECTRICITY_MAX, "
-					                                + "T1.ELECTRICITY_MIN AS ELECTRICITY_MIN, "
-					                                + "T1.AREA AS AREA,T0.P01 AS P01,T0.P02 AS P02,T0.P03 AS P03, "
-					                                + indi_id + " AS INDICATOR_OVERLAP_ID, "
-					                                + "'"+userteam+"'" + " AS USERTEAM, "
-					                                + "(T1.LOAD_MIN - "+load_min+")/"+load_min+" AS LOAD_MIN_ADD, "
-					                                + "(T1.LOAD_MAX - "+load_max+")/"+load_max+" AS LOAD_MAX_ADD, "
-					                                + "(T1.AREA - 0.00000000000000000000e+00) AS AREA_ADD "
-					    				            + "FROM DB2INST1.T_DBAT2071 T0,DB2INST1.T_DBAT2070 T1 "
-					    				            + "WHERE (((T1.P01 = '"+unioncode+"') AND (T1.P02 = '"+well_name+"')) "
-					    				            + "AND (TIMESTAMPDIFF(2,CHAR(TIMESTAMP(T0.P03)-TIMESTAMP('"+date_time+"')))>=0)) " 
-					    					        + "AND (T0.P01 = T1.P01) AND (T0.P02 = T1.P02) AND (T0.P03 = T1.P03) "
-					    					        + "AND (T1.LOAD_MAX>0 AND T1.LOAD_MAX is not null) "
-					    					        + "AND (T1.LOAD_MIN>0 and T1.LOAD_MIN is not null) ORDER BY 11 ASC";*/
 			        			System.out.println("diag:"+sql_get_diag);
 			        			rs_get_diag = stm.executeQuery(sql_get_diag);
 			        			System.out.println("get update info whose date>basedate");
@@ -977,7 +918,6 @@ public class DAO {
 				try{
 					prop.load(in);
 					report_id = prop.getProperty(userteam);
-					System.out.println(">>>>id"+report_id);
 				}catch(Exception e){
 					e.printStackTrace();
 				}
@@ -1024,5 +964,75 @@ public class DAO {
 			}
 	    }	
 		return jsonObj;
+	}
+	
+	public String updateDatabase(final String mb_input, final String mb_output, final String mb_trigger_file, final String mb_complete_flag_file, final String mb_stream_file){
+		String rs_stream = "";
+		if(mb_input != "" && mb_output != ""){
+			File input_fp = new File(mb_input, mb_trigger_file);
+	    	if(!input_fp.exists()){
+	    		try {
+	    			input_fp.createNewFile();
+	    			
+	    			int req_num = 0;
+	    			final int MAX_NUM = 60;
+	    			final int INTERVAL = 5000;
+	    			boolean stream_found = false;
+	    	        while(req_num<MAX_NUM){
+	    	        	try{
+	    	        		Thread.sleep(INTERVAL);
+	    	        		File output_fp = new File(mb_output, mb_complete_flag_file);
+	    	        		if(output_fp.exists()){
+	    	        			try{        		
+	    	    	        		int i = 0;
+	    	    	        		while(i<MAX_NUM){
+	    	    	        			File stream_fp = new File(mb_output, mb_stream_file);
+	    	    	        			if(stream_fp.exists()){
+	    	    	        				stream_found = true;
+	    	    	        				BufferedReader reader = null;
+	    	    	        				try{
+	    	    	        					reader = new BufferedReader(new FileReader(stream_fp));
+	    	    	        					
+	    	    	        					String temp = null;
+	    	    	        					while((temp = reader.readLine()) != null){
+	    	    	        						rs_stream += temp + "\n";
+	    	    	        					}
+	    	    	        					reader.close();
+	    	    	        				}catch(IOException e){
+	    	    	        					e.printStackTrace();
+	    	    	        				} finally {
+	    	    	        		            if (reader != null) {
+	    	    	        		                try {
+	    	    	        		                    reader.close();
+	    	    	        		                } catch (IOException e) {
+	    	    	        		                	e.printStackTrace();
+	    	    	        		                }
+	    	    	        		            }
+	    	    	        		        }
+	    	    	        				
+	    	    	        				break;
+	    	    	        			}
+	    	    	        			Thread.sleep(INTERVAL);
+	    	    	        			i++;
+	    	    	        		}
+	    	        			}catch(InterruptedException e){
+	    	    	        		e.printStackTrace();
+	    	    	        	}
+	    	        					
+	    	        		}
+	    	        	}catch(InterruptedException e){
+	    	        		e.printStackTrace();
+	    	        	}
+	    	        	if(stream_found)
+	        				break;
+	    	        	
+	    	        	req_num++;
+	    	        }
+	    		} catch (IOException e) {
+	    			e.printStackTrace();
+	    		}
+	    	}
+		}
+		return rs_stream;
 	}
 }

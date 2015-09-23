@@ -70,20 +70,16 @@ public class Login_do extends HttpServlet {
 		request.setCharacterEncoding("utf-8"); 
 		response.setCharacterEncoding("utf-8");
 		response.setContentType("text/html; charset=utf-8");
-		
-		logger.debug("enter login_do action...");
+
 		DAO t_user_query = new DAO(db_conn);
 		
 		
 		try{
-			logger.debug("before verifyUser...");
 			boolean check_status = t_user_query.verifyUser(name, pwd) ? true : false;
 			JSONObject jsonObj = new JSONObject();
 			if(check_status){
 				try{
-					logger.debug("before queryUserInfo...");
 					T_User user = t_user_query.queryUserInfo(name);
-					logger.debug("after queryUserInfo");
 					
 					try {
 						jsonObj.put("msg", String.valueOf(check_status)); 
@@ -98,15 +94,15 @@ public class Login_do extends HttpServlet {
 						out.close();
 						out = null;
 					} catch (JSONException e) {
-						logger.error("fail to get information from database!");
+						logger.error("Fail to get information from database!");
 						e.printStackTrace();
 					}
 				}catch(Exception e){
-					logger.error("fail to queryUserInfo from database!");
+					logger.error("Fail to queryUserInfo from database!");
 					e.printStackTrace();
 				}
 			}else{
-				logger.debug("no such user...");
+				logger.debug("No such user...");
 				jsonObj.put("msg", String.valueOf(check_status)); 
 				
 				PrintWriter out = response.getWriter();
@@ -116,7 +112,7 @@ public class Login_do extends HttpServlet {
 				out = null;
 			} 
 		}catch (JSONException e) {
-			logger.error("fail to get information from database!");
+			logger.error("Fail to get information from database!");
 			e.printStackTrace();
 		}		
 	}

@@ -69,6 +69,7 @@
 		<script type="text/javascript" src="js/jquery.cookie.js"></script>
 		<script type="text/javascript" src="js/jquery.reveal.js"></script>
     	<script type="text/javascript" src="js/method.js"></script>
+    	<script type="text/javascript" src="js/userinfo.js"></script>
     	<script type="text/javascript">
 	    	$(document).ready(function(){ 	    		
 	    		$("#warning_box").hide();  	    			
@@ -88,19 +89,25 @@
 	                  dataType: "json",
 	                  success: function(data){
 							if(data.msg == "true"){
-								$.cookie("user",username);
-								$.cookie("userteam",data.userteam);
-								$.cookie("usertype",data.usertype);
-								$.cookie("unioncode",data.unioncode);
-								$.cookie("userteam_name",data.userteam_name);
+								/* userinfo.username = username;
+								userinfo.userteam = data.userteam;
+								userinfo.usertype = data.usertype;
+								userinfo.unioncode = data.unioncode;
+								userinfo.userteam_name = data.userteam_name; */
+								var userinfo_list = [];
+								userinfo_list.push(username);
+								userinfo_list.push(data.userteam);
+								userinfo_list.push(data.usertype);
+								userinfo_list.push(data.unioncode);
+								userinfo_list.push(data.userteam_name);
 								
-								/*for no homepage*/
+/* 								
 								if (data.usertype == "Admin"){
-									$.cookie("view","basediag");//default view for admin； basediag
-								}else if (data.usertype == "User"){
-									$.cookie("view","general");//default view for admin； general
-								}
-								window.open("navigator.html", "_self");
+									userinfo_list.push("basediag");//default view for admin； basediag
+								}else if (data.usertype == "User"){//default view for admin； general
+									userinfo_list.push("general");
+								} */
+								window.open("navigator.html?wd="+escape(userinfo_list.join(";")), "_self");
 							}else{
 								$("#warning_box").text("用户名或密码错误！").show();
 							}

@@ -45,15 +45,27 @@
 	<script type="text/javascript" src="js/bootstrap.min.js"></script>
 	<script type="text/javascript" src="js/jquery.cookie.js"></script>
    	<script type="text/javascript" src="js/method.js"></script>
+   	<script type="text/javascript" src="js/userinfo.js"></script>
     <script type="text/javascript">
-    	$(document).ready(function(){			
-			document.getElementById("username").innerHTML = "用户名: "+ $.cookie("user");
-			document.getElementById("userteam_name").innerHTML = "所属采油队: "+ $.cookie("userteam_name");
-			document.getElementById("usertype").innerHTML = "用户类型: "+ $.cookie("usertype");
-			var usertype = $.cookie("usertype");
-			$.cookie("nav_link", "navigator.html");
-			var nav_link = $.cookie("nav_link");
-			var view_name = $.cookie("view");
+    	$(document).ready(function(){	
+ 			var userinfo_list = unescape(getUrlParam("wd")).split(";");
+ 			var userteam_name=userinfo_list[userinfo_index.userteam_name];
+ 			var username=userinfo_list[userinfo_index.username];
+ 			var userteam=userinfo_list[userinfo_index.userteam];
+ 			var usertype=userinfo_list[userinfo_index.usertype];
+ 			var unioncode = userinfo_list[userinfo_index.unioncode];
+ 			
+ 			var view_name = "";
+			if (usertype == "Admin"){
+				view_name = "basediag";//default view for admin； basediag
+			}else if (usertype == "User"){//default view for admin； general
+				view_name = "general";
+			}
+ 			
+
+			document.getElementById("username").innerHTML = "用户名: "+ username;
+			document.getElementById("userteam_name").innerHTML = "所属采油队: "+ userteam_name;
+			document.getElementById("usertype").innerHTML = "用户类型: "+ usertype;			
 
 			if(usertype == "User"){
 				$(".tab_link").show();
@@ -74,17 +86,20 @@
 					$(this).addClass("inactive");
 				}
 			});
-			
-/* 			var backhome_action = "window.open('homepage.html?user="+$.cookie("user")+"')"; 
-			$("#ret_btn").attr("onclick", backhome_action); */
 
 			//bubble up the hyperlink to all the div
-			$(".inactive").click(function(e){
-				var view_name = $(this).attr("id");
-				$.cookie("view", view_name);
-				window.open(nav_link, "_self");
-				e.stopPropagation();
-				
+			$("li").on("click", function(e){
+				var li_id = $(this).attr("id");
+				if($(this).hasClass("active")){
+					return false;
+				}else{
+					$(this).removeClass("inactive").addClass("active");
+					$(this).siblings(".active").removeClass("active").addClass("inactive");
+					view_name = li_id;
+					$("#nav_main_field").empty();
+					$("#nav_main_field").load(view_name+".html?aa=gogo");
+					e.stopPropagation();
+				}
 			});
 			
 			$("#nav_main_field").load(view_name+".html");
